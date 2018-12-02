@@ -135,7 +135,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'GeVT.tex', 'GeVT Documentation',
-     'Sébastien Weber', 'manual'),
+     'Sebastien Weber', 'manual'),
 ]
 
 
