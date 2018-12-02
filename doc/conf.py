@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'GeVT'
-copyright = '2018, Sébastien Weber'
-author = 'Sébastien Weber'
+copyright = '2018, Sebastien Weber'
+author = 'Sebastien Weber'
 
 # The short X.Y version
 version = ''
