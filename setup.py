@@ -10,7 +10,7 @@ except ImportError:
     from distutils.core import setup
 from distutils.command import install
 
-with open('README.txt') as fd:
+with open('README.md') as fd:
     long_description = fd.read()
 
 setupOpts = dict(
@@ -23,10 +23,10 @@ setupOpts = dict(
     author_email='seba.weber@gmail.com',
     classifiers = [
         "Programming Language :: Python :: 3",
-        "Development Status :: 1 - Beta",
+        #"Development Status :: 1 - Beta",
         "Environment :: Other Environment",
-        "Intended Audience :: Association/Organisation",
-        "License :: OSI Approved :: GNU License",
+        #"Intended Audience :: Association/Organisation",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Software Development :: User Interfaces",
@@ -54,7 +54,7 @@ class Build(build.build):
 
 setup(
     version=0.1,
-     cmdclass={'build': Build,},
+    # cmdclass={'build': Build,},
     #           'install': Install,
     #           'deb': helpers.DebCommand,
     #           'test': helpers.TestCommand,
@@ -72,11 +72,11 @@ setup(
         'pyqtgraph==0.10',
         'pyqt5>5.8',
         ],
-    entry_points={
-            'console_scripts': [
-                'gevt = gevt.gevt:start_gevt',
-            ]
-        },
+    # entry_points={
+    #         'console_scripts': [
+    #             'gevt = gevt.gevt:start_gevt',
+    #         ]
+    #     },
     **setupOpts
 )
 

@@ -1,0 +1,4 @@
+numpy
+yattag
+pyqtgraph==0.10
+pyqt5>5.8
