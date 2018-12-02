@@ -63,7 +63,7 @@ Un événement nouvellement créé est vide. Il ne contient aucune liste de tâc
    :alt: emtpy
    :align: center
    
-   Création d'un nouvel événement vide de taĉhes et de volontaires
+   Création d'un nouvel événement vide de tâches et de volontaires
    
    
    

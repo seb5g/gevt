@@ -9,7 +9,8 @@ Welcome to GeVT's documentation!
 .. toctree::
    :maxdepth: 3
    :caption: Contents:
-   
+
+   usage/about
    usage/installation
    usage/utilisation
 

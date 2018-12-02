@@ -13,11 +13,10 @@ from pyqtgraph.widgets import GradientWidget , ColorButton, SpinBox
 import pyqtgraph.parametertree.parameterTypes as pTypes
 from pyqtgraph.parametertree import Parameter, ParameterItem
 from pyqtgraph.parametertree.Parameter import registerParameterType
-#from PyMoDAQ.DAQ_Utils.plotting.select_item_tolist_main import Select_item_tolist_simpler
 from collections import OrderedDict
 from decimal import Decimal as D
 
-from PyMoDAQ.DAQ_Utils.plotting.QLED.qled import QLED
+
 import xml.etree.ElementTree as ET
 
 from pathlib import Path
@@ -783,13 +782,7 @@ class WidgetParameterItemcustom(pTypes.WidgetParameterItem):
             w.value = w.time
             w.setValue= w.setTime
 
-        elif t=='led':
-            w=QLED()
-            w.clickable=False
-            w.set_as_false()
-            w.sigChanged=w.value_changed
-            w.value = w.get_state
-            w.setValue= w.set_as
+
         elif t=='pixmap':
             w=QtWidgets.QLabel()
             w.sigChanged=None
@@ -925,7 +918,6 @@ registerParameterType('bool_push',SimpleParameterCustom, override=True)
 registerParameterType('date_time', SimpleParameterCustom , override=True)
 registerParameterType('date', SimpleParameterCustom , override=True)
 registerParameterType('time', SimpleParameterCustom , override=True)
-registerParameterType('led', SimpleParameterCustom , override=True)
 registerParameterType('pixmap', SimpleParameterCustom , override=True)
 registerParameterType('pixmap_check', SimpleParameterCustom , override=True)
 registerParameterType('slide', SimpleParameterCustom , override=True)

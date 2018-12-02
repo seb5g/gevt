@@ -9,6 +9,8 @@ except ImportError:
     sys.stderr.write("Warning: could not import setuptools; falling back to distutils.\n")
     from distutils.core import setup
 from distutils.command import install
+import py2exe
+
 
 with open('README.md') as fd:
     long_description = fd.read()
@@ -53,7 +55,7 @@ class Build(build.build):
 
 
 setup(
-    version=0.1,
+    version='0.1.3',
     # cmdclass={'build': Build,},
     #           'install': Install,
     #           'deb': helpers.DebCommand,
@@ -62,21 +64,26 @@ setup(
     #           'mergetest': helpers.MergeTestCommand,
     #           'style': helpers.StyleCommand},
     packages=find_packages(),
-    package_dir={'examples': 'examples'},  ## install examples along with the rest of the source
+    #package_dir={'examples': 'examples'},  ## install examples along with the rest of the source
     package_data={'': ['*.rst'],
-                'examples': ['*.gev', '*.csv'],
+                'gevt.examples': ['*.gev', '*.csv'],
                 'gevt.icons.Icons': ['*.png']},
     install_requires = [
         'numpy',
         'yattag',
         'pyqtgraph==0.10',
+        # 'tensorflow==1.12',
+        # 'tensorflow-probability==0.5.0',
         'pyqt5>5.8',
+        'python-dateutil',
+        'tables',
         ],
-    # entry_points={
-    #         'console_scripts': [
-    #             'gevt = gevt.gevt:start_gevt',
-    #         ]
-    #     },
+    #console =
+    entry_points={
+            'console_scripts': [
+                'gevt = gevt.gevt:start_gevt',
+            ]
+        },
     **setupOpts
 )
 
