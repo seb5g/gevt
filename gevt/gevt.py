@@ -1,14 +1,15 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon Sep 24 21:50:38 2018
 
-@author: avargues-weber
+@author: Sébastien Weber
 """
 import sys
 import os
 path_here = os.path.split(__file__)[0]
 sys.path.append(path_here)
+
+
 
 from dateutil.parser import parse
 import csv
@@ -26,7 +27,7 @@ import datetime
 from enum import Enum
 from pathlib import Path
 from icons import QtDesigner_ressources_rc
-from yattag import Doc
+from yawrap import Doc
 import webbrowser
 #%%
 
@@ -580,6 +581,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
             self.dataChanged.emit(index_ul, index_br, [QtCore.Qt.DisplayRole for ind in range(10)])
 
     def export_html(self,index):
+        path = os.path.split(os.path.abspath(self.h5file.filename))[0]
         self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
         self.task_table = self.h5file.get_node('/tasks/tasks_table')
         vol_id = int(index.sibling(index.row(), self.volunteer_table.colnames.index('idnumber')).data())
@@ -591,7 +593,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
         doc.asis('<!DOCTYPE html>')
         with tag('html', lang='fr'):
             with tag('head'):
-                doc.asis('<meta charset="utf-8"/>')
+                doc.asis('<meta http-equiv="Content-Type" content="text/html; charset=ANSI"/>')
                 with tag('title'):
                     text('fiche bénévole')
                 with tag('style'):
@@ -612,7 +614,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
                                 self.h5file.root._v_attrs['Ndays']).toString('dd/MM/yyyy'),
                             self.h5file.root._v_attrs['event_place']))
                     with tag('h3'):
-                        text('Fiche bénévole pour: {:}'.format(vol['name'].decode()))
+                        doc.asis('Fiche bénévole pour: {:}'.format(vol['name'].decode()))
                 tasks = []
                 for task_id in [v for v in vol['affected_tasks'] if v != -1]:
                     task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(task_id))[0]
@@ -641,7 +643,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
                                 text('Choses à emmener: {:}'.format(task['stuff_needed'].decode()))
                             with tag('p'):
                                 text('Remarques: {:}'.format(task['remarqs'].decode()))
-        path = os.path.abspath('{:}.html'.format(vol['name'].decode()))
+        path = os.path.join(path,'{:}.html'.format(vol['name'].decode()))
         url = 'file://' + path
         with open(path, 'w') as f:
             f.write(doc.getvalue())
@@ -928,6 +930,7 @@ class TaskModel(QtCore.QAbstractTableModel):
             return QtCore.QVariant()
 
     def export_html(self,index):
+        path = os.path.split(os.path.abspath(self.h5file.filename))[0]
         self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
         self.task_table = self.h5file.get_node('/tasks/tasks_table')
 
@@ -935,11 +938,11 @@ class TaskModel(QtCore.QAbstractTableModel):
         doc.asis('<!DOCTYPE html>')
         with tag('html', lang='fr'):
             with tag('head'):
-                doc.asis('<meta charset="utf-8"/>')
+                doc.asis('<meta charset="UTF-8"/>')
                 with tag('title'):
                     text('Liste des tâches')
                 with tag('style'):
-                    pass
+                    text('table, th, td{border: 1px solid black;border-collapse: collapse;}')
             with tag('body'):
                 with tag('div', style=''):
                     with tag('h1'):
@@ -956,15 +959,20 @@ class TaskModel(QtCore.QAbstractTableModel):
                         for name in self.task_table.colnames:
                             with tag('th'):
                                 text(name)
-                        for task in self.task_table:
+                    for task in self.task_table:
+                        with tag('tr'):
                             for name in self.task_table.colnames:
                                 with tag('td'):
-                                    if type(task['name']) == type(b''):
+                                    if isinstance(task[name], bytes):
                                         text(task[name].decode())
-                                    elif type(task['name']) == int:
-                                        text(str(task['name']))
+                                    elif name == "day":
+                                        text(QtCore.QDateTime().fromSecsSinceEpoch(task[name]).toString('dddd'))
+                                    elif 'time' in name:
+                                        text(QtCore.QDateTime().fromSecsSinceEpoch(task[name]).toString('hh:mm'))
+                                    elif isinstance(task[name], int):
+                                        text(str(task[name]))
 
-        path = os.path.abspath('tasks.html')
+        path = os.path.join(path,'tasks.html')
         url = 'file://' + path
         with open(path, 'w') as f:
             f.write(doc.getvalue())
@@ -1434,12 +1442,14 @@ class VolunteerWidget(QtWidgets.QTableView):
         self.doubleClicked.connect(self.edit_task)
 
     def export_html(self):
-        index = self.currentIndex()
-        if index.row() != -1:
-            index_source = index.model().mapToSource(index)
-        else:
-            index_source = index
-        self.model().sourceModel().export_html(index_source)
+        indexes = self.selectedIndexes()
+        for index in indexes:
+            if index.column() == 0:
+                if index.row() != -1:
+                    index_source = index.model().mapToSource(index)
+                else:
+                    index_source = index
+                self.model().sourceModel().export_html(index_source)
 
     def add_new(self):
         index = self.currentIndex()

@@ -10,6 +10,5 @@ Cette section décrit le fonctionnement global de l'application.
    
 
    demarrage
-   importation
    edition
    affecter

@@ -8,9 +8,8 @@ try:
 except ImportError:
     sys.stderr.write("Warning: could not import setuptools; falling back to distutils.\n")
     from distutils.core import setup
-from distutils.command import install
-import py2exe
-
+    from distutils.command import install
+from gevt.version import get_version
 
 with open('README.md') as fd:
     long_description = fd.read()
@@ -19,7 +18,7 @@ setupOpts = dict(
     name='gevt',
     description='Gestionnaire de Volontaires et de Tâches',
     long_description=long_description,
-    license='GNU',
+    license='MIT',
     url='',
     author='Sébastien Weber',
     author_email='seba.weber@gmail.com',
@@ -55,7 +54,7 @@ class Build(build.build):
 
 
 setup(
-    version='0.1.3',
+    version=get_version(),
     # cmdclass={'build': Build,},
     #           'install': Install,
     #           'deb': helpers.DebCommand,
@@ -72,17 +71,12 @@ setup(
         'numpy',
         'yattag',
         'pyqtgraph==0.10',
-        # 'tensorflow==1.12',
-        # 'tensorflow-probability==0.5.0',
-        'pyqt5>5.8',
         'python-dateutil',
         'tables',
         ],
     #console =
     entry_points={
-            'console_scripts': [
-                'gevt = gevt.gevt:start_gevt',
-            ]
+            'console_scripts': ['gevt = gevt.gevt:start_gevt',]
         },
     **setupOpts
 )

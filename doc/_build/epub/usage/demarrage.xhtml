@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title>Démarrage</title>
+    <link rel="stylesheet" href="../_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="demarrage">
+<h1>Démarrage</h1>
+<div class="contents local topic" id="sommaire">
+<ul class="simple">
+<li><p><a class="reference internal" href="#creer-un-nouvel-evenement" id="id4">Créer un nouvel événement</a></p></li>
+<li><p><a class="reference internal" href="#remplir-un-evenement" id="id5">Remplir un événement</a></p></li>
+<li><p><a class="reference internal" href="#editer-un-evenement" id="id6">Éditer un événement</a></p></li>
+</ul>
+</div>
+<p>Au démarrage de GeVT un message apparaît pour <a class="reference internal" href="#new-event"><span class="std std-ref">Créer un nouvel événement</span></a> ou <a class="reference internal" href="#edit-event"><span class="std std-ref">Éditer un événement</span></a>.</p>
+<blockquote>
+<div></div></blockquote>
+<div class="figure align-center" id="id1">
+<span id="figure-start"></span><img alt="Starting message" src="../_images/start.png" style="width: 356.0px; height: 149.0px;" />
+<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">Message de démarrage de GeVT</span></p>
+<div class="legend">
+</div>
+</div>
+<div class="section" id="creer-un-nouvel-evenement">
+<span id="new-event"></span><h2>Créer un nouvel événement</h2>
+<p>Un événement consiste principalement en une date de début et un nombre de jours durant lequel a lieu l’événement.</p>
+<blockquote>
+<div></div></blockquote>
+<div class="figure align-center" id="id2">
+<span id="figure-edit"></span><img alt="configuration" src="../_images/define_event.png" style="width: 361.0px; height: 307.0px;" />
+<p class="caption"><span class="caption-number">Fig. 3 </span><span class="caption-text">Configuration d’un événement</span></p>
+</div>
+<p>La <a class="reference internal" href="#figure-edit"><span class="std std-numref">Fig. 3</span></a> présente les 5 champs configurable d’un événement:</p>
+<ul class="simple">
+<li><p><strong>Event Name</strong>: nom de l’événement. c’est aussi le nom du fichier de sauvegarde.</p></li>
+<li><p><strong>Event Place</strong>: lieu de l’événement</p></li>
+<li><p><strong>Event Start Date</strong>: date de début de l’événement</p></li>
+<li><p><strong>Ndays</strong>: Nombre de jour durant lequel a lieu l’événement</p></li>
+<li><p><strong>Save directory</strong>: emplacement de la sauvegarde.</p></li>
+</ul>
+<p>Ces différents champs peuvent être modifié ensuite dans le menu <em>Settings</em>. Ceci dit, ce n’est pas vraiment recommandé car cela peut induire de nombreux bugs non encore traité… Il vaut donc mieux recommencé avec un nouveau fichier.</p>
+</div>
+<div class="section" id="remplir-un-evenement">
+<h2>Remplir un événement</h2>
+<p>Un événement nouvellement créé est vide. Il ne contient aucune liste de tâches à effectuer ni de volontaires pour y être affecté (voir <a class="reference internal" href="#figure-empty-tables"><span class="std std-numref">Fig. 4</span></a>).</p>
+<blockquote>
+<div></div></blockquote>
+<div class="figure align-center" id="id3">
+<span id="figure-empty-tables"></span><img alt="emtpy" src="../_images/empty_tables.png" style="width: 808.0px; height: 498.40000000000003px;" />
+<p class="caption"><span class="caption-number">Fig. 4 </span><span class="caption-text">Création d’un nouvel événement vide de tâches et de volontaires</span></p>
+<div class="legend">
+</div>
+</div>
+</div>
+<div class="section" id="editer-un-evenement">
+<span id="edit-event"></span><h2>Éditer un événement</h2>
+<p>Tout événement est sauvegardé sous la forme d’un fichier hdf5 ayant l’extension <em>*.gev</em>. Ce fichier contient principalement deux tables, une pour la liste des tâches définies et une pour la liste des bénévoles (volontaires).</p>
+</div>
+</div>
+
+
+          </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

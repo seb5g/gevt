@@ -15,5 +15,7 @@ GitHub repo: https://github.com/seb5g/gevt
 
 Pypi: *pip install gevt*
 
+Ecrit par Sébastien Weber sous licence MIT
+
     
 

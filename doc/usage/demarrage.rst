@@ -1,4 +1,5 @@
-=========
+
+
 Démarrage
 =========
 
@@ -54,7 +55,8 @@ Ces différents champs peuvent être modifié ensuite dans le menu *Settings*. C
 Remplir un événement
 --------------------   
 
-Un événement nouvellement créé est vide. Il ne contient aucune liste de tâches à effectuer ni de volontaires pour y être affecté (voir :numref:`figure_empty_tables`).
+Un événement nouvellement créé est vide. Il ne contient aucune liste de tâches à effectuer
+ni de volontaires pour y être affecté (voir :numref:`figure_empty_tables`).
 
    .. _figure_empty_tables:
    
@@ -65,16 +67,14 @@ Un événement nouvellement créé est vide. Il ne contient aucune liste de tâc
    
    Création d'un nouvel événement vide de tâches et de volontaires
    
-   
-   
+
+Tout événement est sauvegardé sous la forme d'un fichier hdf5 ayant l'extension
+*\*.gev*. Ce fichier contient principalement deux tables, une pour la liste des
+tâches définies et une pour la liste des bénévoles (volontaires).
+
+Il faut donc remplir ces tables!
 
 
-   .. _edit_event:
-   
-Éditer un événement
--------------------
-
-Tout événement est sauvegardé sous la forme d'un fichier hdf5 ayant l'extension *\*.gev*. Ce fichier contient principalement deux tables, une pour la liste des tâches définies et une pour la liste des bénévoles (volontaires).
 
 
 

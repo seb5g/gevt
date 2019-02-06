@@ -48,9 +48,12 @@
           
 
           
-            <a href="../GeVT.html" class="icon icon-home"> GeVT
+            <a href="../index.html" class="icon icon-home"> GeVT
           
 
+          
+            
+            <img src="../_static/gevt_logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -83,9 +86,11 @@
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installer GeVT</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#windows">Windows</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#macos">MacOS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#linux">Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#a-partir-des-sources">A partir des sources:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#avec-pip">Avec Pip:</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilisation.html">Utilisation</a></li>
@@ -103,7 +108,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../GeVT.html">GeVT</a>
+          <a href="../index.html">GeVT</a>
         
       </nav>
 
@@ -132,7 +137,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../GeVT.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
       <li>Installer GeVT</li>
     
@@ -157,35 +162,35 @@
 <h1>Installer GeVT<a class="headerlink" href="#installer-gevt" title="Lien permanent vers ce titre">¶</a></h1>
 <div class="contents local topic" id="sommaire">
 <ul class="simple">
-<li><a class="reference internal" href="#overview" id="id7">Overview</a></li>
-<li><a class="reference internal" href="#windows" id="id8">Windows</a></li>
-<li><a class="reference internal" href="#macos" id="id9">MacOS</a></li>
-<li><a class="reference internal" href="#linux" id="id10">Linux</a></li>
+<li><a class="reference internal" href="#overview" id="id5">Overview</a></li>
+<li><a class="reference internal" href="#installation" id="id6">Installation</a></li>
 </ul>
 </div>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Lien permanent vers ce titre">¶</a></h2>
-<p>GeVT est écrit en <a class="reference external" href="https://docs.python-guide.org/">Python</a> et supporte Python 3.5+. Il utilise la bibliothèque <a class="reference external" href="http://doc.qt.io/qt-5/qt5-intro.html">PyQt5</a> pour son interface utilisateur. Pour commencer, vous devez avoir une distribution de Python installée.</p>
+<p>GeVT est écrit en <a class="reference external" href="https://docs.python-guide.org/">Python</a> et supporte Python 3.5+. Il utilise la bibliothèque <a class="reference external" href="http://doc.qt.io/qt-5/qt5-intro.html">PyQt5</a> pour son interface
+utilisateur. Pour commencer, vous devez avoir une distribution de Python installée.</p>
+<p>La distribution Python recommandée est <a class="reference external" href="https://winpython.github.io/">WinPython</a> qui contient un ensemble conséquent de package pour une
+utilisation versatile de python. Sous Linux et MacOS, une distribution similaire est accessible: <a class="reference external" href="https://www.python.org/downloads/">Anaconda</a>.</p>
 </div>
-<div class="section" id="windows">
-<h2>Windows<a class="headerlink" href="#windows" title="Lien permanent vers ce titre">¶</a></h2>
-<p>La distribution Python recommandée est <a class="reference external" href="https://winpython.github.io/">WinPython</a> qui contient un ensemble conséquent de package pour une utilisation versatile de python. L’autre solution est d”<a class="reference external" href="https://www.python.org/downloads/">installer</a> une version de python vierge (d’ajouter son emplacement dans la variable d’environnement <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. Une fois Python installé sur votre système il suffit de lancer la ligne de commande depuis le repertoire local de GeVT:</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Lien permanent vers ce titre">¶</a></h2>
+<div class="section" id="a-partir-des-sources">
+<h3>A partir des sources:<a class="headerlink" href="#a-partir-des-sources" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Depuis le repertoire local de GeVT (téléchargé depuis Github), il faut lancer la ligne de commande</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">C:\...\GeVT\python setup.py install</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="macos">
-<h2>MacOS<a class="headerlink" href="#macos" title="Lien permanent vers ce titre">¶</a></h2>
-<p>La distribution Python recommandée est <a class="reference external" href="https://www.anaconda.com/download/#linux">Anaconda</a> qui contient un ensemble conséquent de package pour une utilisation versatile de python. Une fois Python installé sur votre système il suffit de lancer la ligne de commande depuis le repertoire local de GeVT:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> ~/.../GeVT/python setup.py install
-</pre></div>
-</div>
-</div>
-<div class="section" id="linux">
-<h2>Linux<a class="headerlink" href="#linux" title="Lien permanent vers ce titre">¶</a></h2>
-<p>La distribution Python recommandée est <a class="reference external" href="https://www.anaconda.com/download/#linux">Anaconda</a> qui contient un ensemble conséquent de package pour une utilisation versatile de python. Une fois Python installé sur votre système il suffit de lancer la ligne de commande depuis le repertoire local de GeVT:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> ~/.../GeVT/python setup.py install
-</pre></div>
+<div class="section" id="avec-pip">
+<h3>Avec Pip:<a class="headerlink" href="#avec-pip" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Il est cependant bien plus simple d’utilisaer l’utilitaire <code class="docutils literal notranslate"><span class="pre">pip</span></code> installé avec winpython. Pour cela:</p>
+<ul class="simple">
+<li>Télécharger winpython et l’installer (choisir un répertoire d’installation sur <code class="docutils literal notranslate"><span class="pre">C:\</span></code> directement,
+par exemple: <code class="docutils literal notranslate"><span class="pre">C:\WPy-3710</span></code></li>
+<li>ouvrir la ligne de commande depuis Winpython <code class="docutils literal notranslate"><span class="pre">C:\WPy-3710\WinPython</span> <span class="pre">Command</span> <span class="pre">Prompt.exe</span></code></li>
+<li>écrire la commande: <code class="docutils literal notranslate"><span class="pre">C:\WPy-3710\scripts\pip</span> <span class="pre">install</span> <span class="pre">gevt</span></code></li>
+</ul>
 </div>
 </div>
 </div>
@@ -210,7 +215,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Sébastien Weber.
+        &copy; Copyright 2018, Sebastien Weber
 
     </p>
   </div>
@@ -229,21 +234,15 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0',
-            LANGUAGE:'fr',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/translations.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/translations.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
