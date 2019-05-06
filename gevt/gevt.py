@@ -239,7 +239,7 @@ class TimeLineModel(QtCore.QAbstractTableModel):
                         if time_step >= self.task_table[row]['time_start'] and time_step < self.task_table[row]['time_end']:
                             flag = True
                             break
-                    if not (time_step > self.volunteer_table[vol_row]['time_start'][index.row()] and time_step < self.volunteer_table[vol_row]['time_end'][index.row()]):
+                    if  not(time_step >= self.volunteer_table[vol_row]['time_start'][index.row()] and time_step <= self.volunteer_table[vol_row]['time_end'][index.row()]):
                         flag = True
                     if flag:
                         brush.setColor(QtGui.QColor(255,0,0))
@@ -341,11 +341,13 @@ class VolunteerModel(QtCore.QAbstractTableModel):
                     else:
                         return QtCore.QVariant()
             else:
-                dat=self.volunteer_table[index.row()][index.column()]
+
                 if index.column() == 1 or index.column() == 2:  # name or remarqs
+                    dat = self.volunteer_table[index.row()][index.column()]
                     return dat.decode()
 
                 elif index.column() == 0: # idnumber
+                    dat = self.volunteer_table[index.row()][index.column()]
                     return int(dat)
 
                 elif index.column() == 3: #affected tasks
@@ -548,7 +550,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
         tasks=[task for task in  self.volunteer_table[row_vol]['affected_tasks'] if task != -1]
 
         if select:
-            list = ListPicker(picker_type="volunteer", h5file=self.h5file, ids=tasks)
+            list = ListPicker(picker_type="task", h5file=self.h5file, ids=tasks)
             ids = list.pick_dialog(connect=False)
         else:
             ids = tasks
@@ -1990,7 +1992,7 @@ class GeVT(QtCore.QObject):
             print(e)
 
     def fill_in_time(self,header_day, string, time='start'):
-        if string == 'X':
+        if string.upper() == 'X':
             if time == 'start':
                 return int(parse(header_day + ' ' + '00:00:00', dayfirst=True).timestamp())
             else:
@@ -1998,8 +2000,13 @@ class GeVT(QtCore.QObject):
         elif string == '':
             return -1
         else:
-            return int(parse(header_day + ' ' + string, dayfirst=True).timestamp())
-
+            try:
+                return int(parse(header_day + ' ' + string, dayfirst=True).timestamp())
+            except:
+                if time == 'start':
+                    return int(parse(header_day + ' ' + '00:00:00', dayfirst=True).timestamp())
+                else:
+                    return int(parse(header_day + ' ' + '23:59:59', dayfirst=True).timestamp())
     # %%
 
     def create_toolbar(self):

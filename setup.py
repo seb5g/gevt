@@ -70,6 +70,7 @@ setup(
     install_requires = [
         'numpy',
         'yattag',
+        'yawrap',
         'pyqtgraph==0.10',
         'python-dateutil',
         'tables',
