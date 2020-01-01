@@ -6,6 +6,8 @@ Created on Mon Sep 24 21:50:38 2018
 """
 import sys
 import os
+from pathlib import Path
+import codecs
 path_here = os.path.split(__file__)[0]
 sys.path.append(path_here)
 
@@ -35,6 +37,28 @@ import webbrowser
 col_task_header=['Task Id','day','type','name','time start','time end','N needed','N filled','remarqs','stuff needed','affected volunteers']
 col_volunteer_header=['Vol. Id', 'name', 'remarqs','affected tasks']
 
+
+def odd_even(x):
+    """
+		odd_even tells if a number is odd (return True) or even (return False)
+
+		Parameters
+		----------
+		x: the integer number to test
+
+		Returns
+		-------
+		bool : boolean
+    """
+    if int(x) % 2 == 0:
+        bool = False
+    else:
+        bool = True
+    return bool
+
+
+def get_overlap(a, b):
+    return min(a[1], b[1]) - max(a[0], b[0])
 
 def select_file(start_path=None, save=True, ext=None):
     """
@@ -77,7 +101,7 @@ def select_file(start_path=None, save=True, ext=None):
         fname = QtWidgets.QFileDialog.getOpenFileName(None, 'Select a file name', start_path, filter)
 
     fname = fname[0]
-    if fname == '':  # execute if the user didn't cancel the file selection
+    if fname != '':  # execute if the user didn't cancel the file selection
         fname = Path(fname)
         if save:
             parent = fname.parent
@@ -139,8 +163,6 @@ class TimeLineModel(QtCore.QAbstractTableModel):
         index_br=self.createIndex(len(self.days)-1,self.Nsteps-1)
         self.dataChanged.emit(index_ul,index_br,[QtCore.Qt.DisplayRole for ind in range(self.Nsteps*len(self.days))])
 
-        
-        
     def update_steps(self):
         try:
             self.task_table = self.h5file.get_node('/tasks/tasks_table')
@@ -220,7 +242,13 @@ class TimeLineModel(QtCore.QAbstractTableModel):
                     if Nneeded == 0:
                         Nneeded=1
                         Nfilled = 1
-                    brush.setColor(self.colors.map((Nneeded-Nfilled) / Nneeded, mode='qcolor'))
+                        ratio = 0
+                    else:
+                        if Nfilled < Nneeded:
+                            ratio = 1
+                        else:
+                            ratio = 0
+                    brush.setColor(self.colors.map(ratio, mode='qcolor'))
                 elif self.view_type == '':
                     return QtCore.QVariant()
                 else:
@@ -233,13 +261,13 @@ class TimeLineModel(QtCore.QAbstractTableModel):
                     flag = False
                     time_step = QtCore.QDateTime().fromSecsSinceEpoch(self.time_steps[index.column()]).addDays(
                         index.row()).toSecsSinceEpoch()
+                    #Check in affected tasks if this timestep is used or not
                     for row in tasks_row:
-                        # self.time_steps are properly defined only for the first day, to do add a loop on the number of days adding a day to all time_steps
-
                         if time_step >= self.task_table[row]['time_start'] and time_step < self.task_table[row]['time_end']:
                             flag = True
                             break
-                    if  not(time_step >= self.volunteer_table[vol_row]['time_start'][index.row()] and time_step <= self.volunteer_table[vol_row]['time_end'][index.row()]):
+                    #check if this time step is available in the volunteer schedule
+                    if  not(time_step >= self.volunteer_table[vol_row]['time_start'][index.row()] and time_step < self.volunteer_table[vol_row]['time_end'][index.row()]):
                         flag = True
                     if flag:
                         brush.setColor(QtGui.QColor(255,0,0))
@@ -482,7 +510,10 @@ class VolunteerModel(QtCore.QAbstractTableModel):
 
 
     def insertRows(self, row: int, count: int, parent):
-        self.beginInsertRows(parent,row-1,row-1)
+        if row == 0:
+            self.beginInsertRows(parent, row, row)
+        else:
+            self.beginInsertRows(parent,row-1,row-1)
         mapper=VolunteerWidgetMapper(self.h5file)
         res=mapper.show_dialog()
         if res is not None:
@@ -518,10 +549,10 @@ class VolunteerModel(QtCore.QAbstractTableModel):
             self.task_table.cols.N_filled[task_row]+=1
             self.task_table.flush()
 
-            for ind_task, task_id_tmp in enumerate(self.volunteer_table[idvol]['affected_tasks']):
+            for ind_task, task_id_tmp in enumerate(self.volunteer_table[vol_row]['affected_tasks']):
                 if task_id_tmp == -1:
                     break
-            tasks = self.volunteer_table.cols.affected_tasks[idvol]
+            tasks = self.volunteer_table.cols.affected_tasks[vol_row]
             tasks[ind_task] = task_id
             self.volunteer_table.cols.affected_tasks[idvol] = tasks
             self.volunteer_table.flush()
@@ -582,20 +613,255 @@ class VolunteerModel(QtCore.QAbstractTableModel):
             index_br = self.createIndex(index.row(), len(self.task_table.colnames)-1)
             self.dataChanged.emit(index_ul, index_br, [QtCore.Qt.DisplayRole for ind in range(10)])
 
-    def export_html(self,index):
+    def export_csv(self):
+        self.task_table = self.h5file.get_node('/tasks/tasks_table')
         path = os.path.split(os.path.abspath(self.h5file.filename))[0]
+        filename = select_file(path, ext='csv')
+        if filename != '':
+            with open(filename, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile, delimiter=',')
+                for vol in self.volunteer_table:
+                    row = []
+                    for name in self.volunteer_table.colnames:
+                        if isinstance(vol[name], bytes):
+                            row.append(vol[name].decode())
+                        elif name == "day":
+                            row.append(QtCore.QDateTime().fromSecsSinceEpoch(vol[name]).toString('dddd'))
+                        elif 'time' in name:
+                            row.append(QtCore.QDateTime().fromSecsSinceEpoch(vol[name][0]).toString('hh:mm'))
+                            row.append(QtCore.QDateTime().fromSecsSinceEpoch(vol[name][1]).toString('hh:mm'))
+                        elif isinstance(vol[name], int):
+                            row.append(str(vol[name]))
+                        elif isinstance(vol[name], np.ndarray):
+                            names = []
+                            for id in vol[name]:
+                                if id != -1:
+                                    task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(id))[0]
+                                    names.append('[{:d}, {:s}]'.format(id, self.task_table[task_row]['name'].decode()))
+                            row.append(str(names))
+                    #print(row)
+                    writer.writerow(row)
+
+    def export_html(self,index=None, export_all=False):
+
         self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
         self.task_table = self.h5file.get_node('/tasks/tasks_table')
-        vol_id = int(index.sibling(index.row(), self.volunteer_table.colnames.index('idnumber')).data())
-        vol_row = self.volunteer_table.get_where_list("""(idnumber == {:})""".format(vol_id))[0]
+        if index is not None:
+            vol_id = int(index.sibling(index.row(), self.volunteer_table.colnames.index('idnumber')).data())
+            vol_row = self.volunteer_table.get_where_list("""(idnumber == {:})""".format(vol_id))[0]
+            vol = self.volunteer_table[vol_row]
+            self.create_html_timeline(vol, vol_id)
+        elif export_all:
+            for ind_vol, vol in enumerate(self.volunteer_table):
+                self.create_html_timeline(vol, ind_vol)
 
-        vol=self.volunteer_table[vol_row]
+    def create_html_timeline(self,vol, vol_id):
+        tasks = []
+        for task_id in [v for v in vol['affected_tasks'] if v != -1]:
+            task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(task_id))[0]
+            task = self.task_table[task_row]
+            tasks.append(task)
+        tasks.sort(key=lambda t: t['time_start'])
 
+        path = os.path.split(os.path.abspath(self.h5file.filename))[0]
         doc, tag, text = Doc().tagtext()
         doc.asis('<!DOCTYPE html>')
         with tag('html', lang='fr'):
             with tag('head'):
-                doc.asis('<meta http-equiv="Content-Type" content="text/html; charset=ANSI"/>')
+                doc.asis('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>')
+                with tag('title'):
+                    text('fiche bénévole')
+                with tag('style'):
+                    doc.asis("""* {
+                          box-sizing: border-box;
+                        }
+
+                        /* Set a background color */
+                        body {
+                          background-color: #474e5d;
+                          font-family: Helvetica, sans-serif;
+                        }
+
+                        /* The actual timeline (the vertical ruler) */
+                        .timeline {
+                          position: relative;
+                          max-width: 1200px;
+                          margin: 0 auto;
+                        }
+
+                        /* The actual timeline (the vertical ruler) */
+                        .timeline::after {
+                          content: '';
+                          position: absolute;
+                          width: 6px;
+                          background-color: white;
+                          top: 0;
+                          bottom: 0;
+                          left: 50%;
+                          margin-left: -3px;
+                        }
+
+                        /* Container around content */
+                        .container {
+                          padding: 10px 40px;
+                          position: relative;
+                          background-color: inherit;
+                          width: 50%;
+                        }
+
+                        /* The circles on the timeline */
+                        .container::after {
+                          content: '';
+                          position: absolute;
+                          width: 25px;
+                          height: 25px;
+                          right: -17px;
+                          background-color: white;
+                          border: 4px solid #FF9F55;
+                          top: 15px;
+                          border-radius: 50%;
+                          z-index: 1;
+                        }
+
+                        /* Place the container to the left */
+                        .left {
+                          left: 0;
+                        }
+
+                        /* Place the container to the right */
+                        .right {
+                          left: 50%;
+                        }
+
+                        /* Add arrows to the left container (pointing right) */
+                        .left::before {
+                          content: " ";
+                          height: 0;
+                          position: absolute;
+                          top: 22px;
+                          width: 0;
+                          z-index: 1;
+                          right: 30px;
+                          border: medium solid white;
+                          border-width: 10px 0 10px 10px;
+                          border-color: transparent transparent transparent white;
+                        }
+
+                        /* Add arrows to the right container (pointing left) */
+                        .right::before {
+                          content: " ";
+                          height: 0;
+                          position: absolute;
+                          top: 22px;
+                          width: 0;
+                          z-index: 1;
+                          left: 30px;
+                          border: medium solid white;
+                          border-width: 10px 10px 10px 0;
+                          border-color: transparent white transparent transparent;
+                        }
+
+                        /* Fix the circle for containers on the right side */
+                        .right::after {
+                          left: -16px;
+                        }
+
+                        /* The actual content */
+                        .content {
+                          padding: 20px 30px;
+                          background-color: white;
+                          position: relative;
+                          border-radius: 6px;
+                        }
+
+                        /* Media queries - Responsive timeline on screens less than 600px wide */
+                        @media screen and (max-width: 600px) {
+                        /* Place the timelime to the left */
+                          .timeline::after {
+                            left: 31px;
+                          }
+
+                        /* Full-width containers */
+                          .container {
+                            width: 100%;
+                            padding-left: 70px;
+                            padding-right: 25px;
+                          }
+
+                        /* Make sure that all arrows are pointing leftwards */
+                          .container::before {
+                            left: 60px;
+                            border: medium solid white;
+                            border-width: 10px 10px 10px 0;
+                            border-color: transparent white transparent transparent;
+                          }
+
+                        /* Make sure all circles are at the same spot */
+                          .left::after, .right::after {
+                            left: 15px;
+                          }
+
+                        /* Make all right containers behave like the left ones */
+                          .right {
+                            left: 0%;
+                          }
+                        }
+                    """)
+            with tag('body'):
+                with tag('div', style=''):
+                    with tag('h1'):
+                        text(self.h5file.root._v_attrs['event_name'])
+                    with tag('h2'):
+                        text('du {:} au {:} à {:}'.format(
+                            QtCore.QDateTime().fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).toString(
+                                'dd/MM/yyyy'),
+                            QtCore.QDateTime().fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).addDays(
+                                self.h5file.root._v_attrs['Ndays']).toString('dd/MM/yyyy'),
+                            self.h5file.root._v_attrs['event_place']))
+                    with tag('h3'):
+                        doc.asis('Fiche bénévole pour: {:}'.format(vol['name'].decode()))
+                with tag('div', klass='timeline'):
+                    for ind, task in enumerate(tasks):
+                        if not odd_even(ind):
+                            container = 'container left'
+                        else:
+                            container = 'container right'
+                        with tag('div', klass=container):
+                            with tag('div', klass='content'):
+                                with tag('h2'):
+                                    text('{:} de {:} à {:}'.format(
+                                        QtCore.QDateTime().fromSecsSinceEpoch(task['time_start']).toString(
+                                            'dddd dd/MM/yyyy'),
+                                        QtCore.QDateTime().fromSecsSinceEpoch(task['time_start']).toString('hh:mm'),
+                                        QtCore.QDateTime().fromSecsSinceEpoch(task['time_end']).toString('hh:mm')))
+                                with tag('h3'):
+                                    text(task['name'].decode())
+                                with tag('p'):
+                                    vols = []
+                                    for id_tmp in [v for v in task['affected_volunteers'] if v != -1 and v != vol_id]:
+                                        vol_row_tmp = \
+                                        self.volunteer_table.get_where_list("""(idnumber == {:})""".format(id_tmp))[0]
+                                        vols.append(self.volunteer_table[vol_row_tmp]['name'].decode())
+                                    text('Autres volontaires: {:}'.format(vols))
+                                with tag('p'):
+                                    text('Choses à emmener: {:}'.format(task['stuff_needed'].decode()))
+                                with tag('p'):
+                                    text('Remarques: {:}'.format(task['remarqs'].decode()))
+
+        path = os.path.join(path,'{:}.html'.format(vol['name'].decode()))
+        url = 'file://' + path
+        with codecs.open(path, 'wb', 'utf-8') as f:
+            f.write(doc.getvalue())
+        webbrowser.open(url)
+
+
+    def create_html(self,vol, vol_id):
+        path = os.path.split(os.path.abspath(self.h5file.filename))[0]
+        doc, tag, text = Doc().tagtext()
+        doc.asis('<!DOCTYPE html>')
+        with tag('html', lang='fr'):
+            with tag('head'):
+                doc.asis('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>')
                 with tag('title'):
                     text('fiche bénévole')
                 with tag('style'):
@@ -604,6 +870,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
                     doc.asis('.row {line-height:24pt;}')
                     doc.asis('div.container > div:nth-of-type(odd) {background: #cce0ff;}')
                     doc.asis('div.container > div:nth-of-type(even) {background: #ffff80;}')
+
             with tag('body'):
                 with tag('div', style=''):
                     with tag('h1'):
@@ -645,9 +912,10 @@ class VolunteerModel(QtCore.QAbstractTableModel):
                                 text('Choses à emmener: {:}'.format(task['stuff_needed'].decode()))
                             with tag('p'):
                                 text('Remarques: {:}'.format(task['remarqs'].decode()))
+
         path = os.path.join(path,'{:}.html'.format(vol['name'].decode()))
         url = 'file://' + path
-        with open(path, 'w') as f:
+        with codecs.open(path, 'wb', 'utf-8') as f:
             f.write(doc.getvalue())
         webbrowser.open(url)
 
@@ -746,7 +1014,57 @@ class TaskModel(QtCore.QAbstractTableModel):
         mapper=TaskWidgetMapper(self.h5file,task_row)
         res=mapper.show_dialog()
         if res is not None:
-            self.task_param_to_row(res,task_row)
+            if res.child('task_settings','time_start').value() !=\
+                QtCore.QDateTime().fromSecsSinceEpoch(self.task_table[task_row]['time_start']).time() or\
+                    res.child('task_settings', 'time_end').value() !=\
+                    QtCore.QDateTime().fromSecsSinceEpoch(self.task_table[task_row]['time_end']).time():  #means time_start or time_end has been changed, so maybe not consistent anymore with affected tasks to other volunteers
+                consistent, messg = self.check_consistency(res, task_row)
+            else:
+                consistent, messg = True, ''
+            if consistent:
+                self.task_param_to_row(res,task_row)
+            else:
+                messgbox = QtWidgets.QMessageBox()
+                messgbox.setText(messg)
+                messgbox.exec()
+
+    def check_consistency(self,res,task_id):
+        """
+        Will check if the modified task times are still compatible with affected volunteers
+        Returns
+        -------
+        (bool, str): tuple with a bool: True if consistent otherwise False, if False, returns also a message with the volunteer id for who the consistency is wrong
+        """
+
+        task_row = self.task_table[task_id]
+
+        vols = [vol for vol in task_row['affected_volunteers'] if vol != -1]
+
+        time_start = QtCore.QDateTime(res.child('task_settings', 'day').value(),res.child('task_settings', 'time_start').value()).toSecsSinceEpoch()
+        time_end = QtCore.QDateTime(res.child('task_settings', 'day').value(),
+                                      res.child('task_settings', 'time_end').value()).toSecsSinceEpoch()
+
+        for vol_id in vols:
+            # check if this modification is compatible with volunteer availability
+            list = ListPicker(task_row, time_start, time_end, "volunteer", self.h5file)
+            availlable_ids = list.check_availlable(vol_id, time_start, time_end, [], task_id)
+            if vol_id not in availlable_ids:
+                return False, 'The new times are not compatible with vol {:d}: {:s} and its availlability'.format(
+                    vol_id, self.volunteer_table[vol_id]['name'].decode())
+
+            #check if this modification is compatible with others affected tasks
+            affected_tasks_ids = [task for task in self.volunteer_table[vol_id]['affected_tasks'] if task != -1]
+            affected_tasks_ids.pop(affected_tasks_ids.index(task_id)) #do not include the one that has just been modified
+            affected_tasks_times = [(task['time_start'], task['time_end']) for task in self.task_table if
+                                    task['idnumber'] in affected_tasks_ids]
+            for ind in range(len(affected_tasks_times)):
+                #check if this modification is compatible with other affected tasks
+                if get_overlap([affected_tasks_times[ind][0], affected_tasks_times[ind][1]], [time_start, time_end]) > 0:
+                    return False, 'The new times are not compatible with vol {:d}: {:s} and its other task : {:d}'.format(vol_id, self.volunteer_table[vol_id]['name'].decode(),
+                                                                                 affected_tasks_ids[ind])
+
+
+        return True, ''
 
 
     def add_volunteer(self,index):
@@ -757,7 +1075,7 @@ class TaskModel(QtCore.QAbstractTableModel):
 
         list=ListPicker(task_row,time_start,time_end,"volunteer",self.h5file)
 
-        volunteers=list.pick_dialog()
+        volunteers=list.pick_dialog(add=True)
 
         for idvol in volunteers:
             row=self.volunteer_table.get_where_list("""(idnumber == {:})""".format(idvol))[0]
@@ -802,7 +1120,7 @@ class TaskModel(QtCore.QAbstractTableModel):
 
         if select:
             list = ListPicker(picker_type="volunteer", h5file=self.h5file, ids=volunteers)
-            ids = list.pick_dialog(connect=False)
+            ids = list.pick_dialog(connect=False, add=False)
         else:
             ids = volunteers
         for idvol in ids:
@@ -931,10 +1249,35 @@ class TaskModel(QtCore.QAbstractTableModel):
         else:
             return QtCore.QVariant()
 
-    def export_html(self,index):
+    def export_csv(self):
+        path = os.path.split(os.path.abspath(self.h5file.filename))[0]
+        filename = select_file(path, ext='csv')
+        if filename != '':
+            with codecs.open(filename, 'w', 'utf-8') as csvfile:
+                writer = csv.writer(csvfile, delimiter=',')
+                for task in self.task_table:
+                    row = []
+                    for name in self.task_table.colnames:
+                        if isinstance(task[name], bytes):
+                            row.append(task[name].decode())
+                        elif name == "day":
+                            row.append(QtCore.QDateTime().fromSecsSinceEpoch(task[name]).toString('dddd'))
+                        elif 'time' in name:
+                            row.append(QtCore.QDateTime().fromSecsSinceEpoch(task[name]).toString('hh:mm'))
+                        elif isinstance(task[name], int):
+                            row.append(str(task[name]))
+                        elif isinstance(task[name], np.ndarray):
+                            names = [self.volunteer_table[ind_row]['name'].decode() for ind_row in task[name] if
+                                     ind_row != -1]
+                            row.append(str(names))
+                    print(row)
+                    writer.writerow(row)
+
+    def export_html(self):
         path = os.path.split(os.path.abspath(self.h5file.filename))[0]
         self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
         self.task_table = self.h5file.get_node('/tasks/tasks_table')
+
 
         doc, tag, text = Doc().tagtext()
         doc.asis('<!DOCTYPE html>')
@@ -945,6 +1288,7 @@ class TaskModel(QtCore.QAbstractTableModel):
                     text('Liste des tâches')
                 with tag('style'):
                     text('table, th, td{border: 1px solid black;border-collapse: collapse;}')
+
             with tag('body'):
                 with tag('div', style=''):
                     with tag('h1'):
@@ -973,14 +1317,22 @@ class TaskModel(QtCore.QAbstractTableModel):
                                         text(QtCore.QDateTime().fromSecsSinceEpoch(task[name]).toString('hh:mm'))
                                     elif isinstance(task[name], int):
                                         text(str(task[name]))
+                                    elif isinstance(task[name], np.ndarray):
+                                        names = [self.volunteer_table[ind_row]['name'].decode() for ind_row in task[name] if ind_row!=-1]
+                                        text(str(names))
 
         path = os.path.join(path,'tasks.html')
         url = 'file://' + path
-        with open(path, 'w') as f:
+        with codecs.open(path, 'wb', 'utf-8') as f:
             f.write(doc.getvalue())
         webbrowser.open(url)
 
+class TableView_clickonly(QtWidgets.QTableView):
+    def __init__(self):
+        super().__init__()
 
+    def mouseMoveEvent(self, event):
+        event.accept()
 
 class ListPicker(QtCore.QObject):
 
@@ -992,6 +1344,7 @@ class ListPicker(QtCore.QObject):
         self.row=row
         self.ts=ts
         self.te=te
+        self.add = True # True if pick dialog is called to add some element of the list,
 
         if h5file is not None:
             self.task_table=self.h5file.get_node('/tasks/tasks_table')
@@ -1005,7 +1358,7 @@ class ListPicker(QtCore.QObject):
 
 
 
-    def check_availlable(self,vol_row,time_start,time_end,selected_ids=[]):
+    def check_availlable(self,vol_row,time_start,time_end,selected_ids=[], id_to_not_check=None):
 
         id_list=[]
         if self.picker_type == 'task':
@@ -1017,31 +1370,40 @@ class ListPicker(QtCore.QObject):
 
                     test = []
                     for ind in range(len(time_start)):
-                        test.append([time_start[ind]<=task_row['time_start'],time_end[ind]>=task_row['time_end']]) #test if this task (time_start,time_send) is compatible with volunteer presence
+                        overlap = get_overlap([time_start[ind],time_end[ind]],[task_row['time_start'],task_row['time_end']])
+                        test.append(overlap >= (task_row['time_end']-task_row['time_start']))
+                        #test.append([time_start[ind]<=task_row['time_start'],time_end[ind]>=task_row['time_end']]) #test if this task (time_start,time_send) is compatible with volunteer presence
 
-                    test = np.any(np.all(test, 1))  # there is one slot available (but ùaybe other tasks collide....
+                    #test = np.any(np.all(test, 1))  # there is one slot available (but ùaybe other tasks collide....
+                    test = np.any(test)
                     if test:
                         flag = False
                         for atime in affected_tasks_times:
-                            if task_row['time_start']<atime[1] and task_row['time_end']>atime[0]:
+                            if get_overlap([task_row['time_start'],task_row['time_end']],[atime[0], atime[1]]) > 0:
                                 flag = True
+                            #if task_row['time_start']<atime[1] and task_row['time_end']>atime[0]:
+                                #flag = True
                         if not flag:
                             id_list.append(task_row['idnumber'])
         else:
             for vol_row in self.volunteer_table:
                 affected_tasks_ids = [task for task in vol_row['affected_tasks'] if task != -1]
+                if id_to_not_check is not None and id_to_not_check in affected_tasks_ids:
+                    affected_tasks_ids.pop(affected_tasks_ids.index(id_to_not_check))
                 affected_tasks_times = [(task['time_start'], task['time_end']) for task in self.task_table if
                                         task['idnumber'] in affected_tasks_ids]
-
-                test = np.stack((time_start >= vol_row['time_start'], time_end <= vol_row[
-                    'time_end']))  # test if this task (time_start,time_send) is compatible with volunteer presence
-                test = np.any(np.all(test, 0))  # there is one slot available (but ùaybe other tasks collide....
+                #TODO check if below is correct in differents  cases
+                test = []
+                for ind in range (vol_row['time_start'].size):
+                    overlap = get_overlap([time_start, time_end], [vol_row['time_start'][ind], vol_row['time_end'][ind]])
+                    test.append(overlap >= (time_end - time_start))
+                #µtest = np.stack((time_start >= vol_row['time_start'], time_end <= vol_row['time_end']))  # test if this task (time_start,time_send) is compatible with volunteer presence
+                test = np.any(test)  # there is one slot available (but ùaybe other tasks collide....
 
                 test_other_tasks = [test]
                 for atime in affected_tasks_times:
-                    test_other_tasks.append(not (time_start >= atime[0] and time_end <= atime[1]))
-
-                if np.all(np.array(test_other_tasks)):
+                    test_other_tasks.append(get_overlap([time_start, time_end], [atime[0], atime[1]]) <= 0)
+                if np.all(test_other_tasks):
                     id_list.append(vol_row['idnumber'])
 
         return id_list
@@ -1050,6 +1412,8 @@ class ListPicker(QtCore.QObject):
         if self.picker_type == 'task':
             selected_indexes=self.table_view.selectedIndexes()
             selected_ids = [ind.data() for ind in selected_indexes if ind.column()==0]
+
+
 
             valid_tasks_ids=self.check_availlable(self.row,self.ts,self.te,selected_ids)+selected_ids
             valid_tasks_ids.sort()
@@ -1063,22 +1427,49 @@ class ListPicker(QtCore.QObject):
 
 
         elif self.picker_type == 'volunteer':
-            pass
+            selected_cols = set([index.row() for index in self.table_view.selectedIndexes()])
+            if self.add:
+                N_more_needed = self.task_table[self.row]['N_needed'] - len(selected_cols) - self.task_table[self.row]['N_filled']
+                self.Nmore_needed_sb.setValue(N_more_needed)
+                if N_more_needed <= 0:
+                    self.Nmore_needed_sb.setStyleSheet("background-color: rgba(0,255,0,255)")
+                else:
+                    self.Nmore_needed_sb.setStyleSheet("background-color: red")
 
         else:
             raise Exception('invalid picker type')
 
 
+    def pick_dialog(self,connect=True, add=True,):
 
-    def pick_dialog(self,connect=True):
+        self.add = add
         self.dialog = QtWidgets.QDialog()
         self.dialog.setMinimumWidth(500)
         vlayout = QtWidgets.QVBoxLayout()
+        form = QtWidgets.QWidget()
+        hlayout = QtWidgets.QHBoxLayout()
+        if self.picker_type == 'task':
+            pick_type_label = QtWidgets.QLabel('Pick some tasks for your volunteer (Ctrl+left click to select/deselect)')
+        else:
+            pick_type_label = QtWidgets.QLabel('Pick some volunteers for this task (Ctrl+left click to select/deselect)')
+        hlayout.addWidget(pick_type_label)
+        if self.picker_type != 'task' and self.add:
+            N_more_needed = self.task_table[self.row]['N_needed'] - self.task_table[self.row]['N_filled']
+            self.Nmore_needed_sb = QtWidgets.QSpinBox()
+            self.Nmore_needed_sb.setMaximumWidth(100)
+            self.Nmore_needed_sb.setToolTip('Remaining number of volunteers to pick')
+            self.Nmore_needed_sb.setValue(N_more_needed)
+            if N_more_needed <= 0:
+                self.Nmore_needed_sb.setStyleSheet("background-color: rgba(0,255,0,255)")
+            else:
+                self.Nmore_needed_sb.setStyleSheet("background-color: red")
+            hlayout.addWidget(self.Nmore_needed_sb)
 
+        form.setLayout(hlayout)
+        vlayout.addWidget(form)
 
-
-        self.table_view=QtWidgets.QTableView()
-        self.table_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.table_view=TableView_clickonly()
+        self.table_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         if self.picker_type == 'task':
             model = TaskModel(self.h5file, self.list_ids)
         else:
@@ -1092,7 +1483,7 @@ class ListPicker(QtCore.QObject):
         self.table_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.table_view.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 
-        self.table_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.table_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
         if connect:
             self.table_view.clicked.connect(self.update_table)
@@ -1363,7 +1754,9 @@ class TaskWidget(QtWidgets.QTableView):
         self.menu.addSeparator()
         self.import_action = self.menu.addAction('Import from csv')
         self.export_action = self.menu.addAction('Export to html')
+        self.export_csv_action = self.menu.addAction('Export to csv')
         self.export_action.triggered.connect(self.export_html)
+        self.export_csv_action.triggered.connect(self.export_csv)
 
         add_new.triggered.connect(self.add_new)
         edit_task.triggered.connect(self.edit_task)
@@ -1373,13 +1766,13 @@ class TaskWidget(QtWidgets.QTableView):
 
         self.doubleClicked.connect(self.edit_task)
 
+    def export_csv(self):
+        self.model().sourceModel().export_csv()
+
+
+
     def export_html(self):
-        index = self.currentIndex()
-        if index.row() != -1:
-            index_source = index.model().mapToSource(index)
-        else:
-            index_source = index
-        self.model().sourceModel().export_html(index_source)
+        self.model().sourceModel().export_html()
 
     def add_new(self):
         index = self.currentIndex()
@@ -1433,6 +1826,8 @@ class VolunteerWidget(QtWidgets.QTableView):
         self.menu.addSeparator()
         self.import_action = self.menu.addAction('Import from csv')
         self.export_action = self.menu.addAction('Export to html')
+        self.export_all_action = self.menu.addAction('Export all to html')
+        self.export_csv_action = self.menu.addAction('Export all to csv')
 
         add_new.triggered.connect(self.add_new)
         edit_task.triggered.connect(self.edit_task)
@@ -1440,18 +1835,26 @@ class VolunteerWidget(QtWidgets.QTableView):
         add_task.triggered.connect(self.add_task)
         remove_task.triggered.connect(self.remove_task)
         self.export_action.triggered.connect(self.export_html)
+        self.export_all_action.triggered.connect(lambda: self.export_html(True))
+        self.export_csv_action.triggered.connect(self.export_csv)
 
         self.doubleClicked.connect(self.edit_task)
 
-    def export_html(self):
-        indexes = self.selectedIndexes()
-        for index in indexes:
-            if index.column() == 0:
-                if index.row() != -1:
-                    index_source = index.model().mapToSource(index)
-                else:
-                    index_source = index
-                self.model().sourceModel().export_html(index_source)
+    def export_csv(self):
+        self.model().sourceModel().export_csv()
+
+    def export_html(self, export_all=False):
+        if export_all:
+            self.model().sourceModel().export_html(export_all=export_all)
+        else:
+            indexes = self.selectedIndexes()
+            for index in indexes:
+                if index.column() == 0:
+                    if index.row() != -1:
+                        index_source = index.model().mapToSource(index)
+                    else:
+                        index_source = index
+                    self.model().sourceModel().export_html(index_source)
 
     def add_new(self):
         index = self.currentIndex()
@@ -1603,18 +2006,7 @@ class GeVT(QtCore.QObject):
         self.task_view.setModel(self.proxymodel)
         self.task_view.setSortingEnabled(True)
 
-        self.timeline_model_needed = TimeLineModel(self.h5file, view_type='N_needed')
-        self.timeline_model_filled = TimeLineModel(self.h5file, view_type='N_filled')
-        if self.volunteer_table.nrows != 0:
-            self.vol_name=self.volunteer_table[0]['name'].decode()
-        else:
-            self.vol_name = ''
-        self.timeline_model_vol = TimeLineModel(self.h5file, view_type=self.vol_name)
-
-
-        self.timeline_needed.setModel(self.timeline_model_needed)
-        self.timeline_filled.setModel(self.timeline_model_filled)
-        self.timeline_vol.setModel(self.timeline_model_vol)
+        self.update_time_line_model()
 
         self.volunteer_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
         self.task_view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
@@ -1624,13 +2016,30 @@ class GeVT(QtCore.QObject):
 
         self.volunteer_view.index_changed_signal.connect(self.update_vol_label)
 
-        self.volunteer_model.update_signal.connect(self.timeline_model_needed.update_steps)
-        self.volunteer_model.update_signal.connect(self.timeline_model_filled.update_steps)
-        self.volunteer_model.update_signal.connect(self.timeline_model_vol.update_steps)
-        self.task_model.update_signal.connect(self.timeline_model_needed.update_steps)
-        self.task_model.update_signal.connect(self.timeline_model_filled.update_steps)
-        self.task_model.update_signal.connect(self.timeline_model_vol.update_steps)
+        self.volunteer_model.update_signal.connect(self.timeline_model_needed.update)
+        self.volunteer_model.update_signal.connect(self.timeline_model_filled.update)
+        self.volunteer_model.update_signal.connect(self.timeline_model_vol.update)
+        self.task_model.update_signal.connect(self.update_time_line_model)
+        self.task_model.update_signal.connect(self.update_time_line_model)
+        self.task_model.update_signal.connect(self.update_time_line_model)
 
+    def update_time_line_model(self):
+        self.timeline_model_needed = TimeLineModel(self.h5file, view_type='N_needed')
+        self.timeline_model_filled = TimeLineModel(self.h5file, view_type='N_filled')
+        if self.volunteer_table.nrows != 0:
+            if self.volunteer_view.currentIndex().isValid():
+                index_model_row = self.volunteer_view.currentIndex().model().mapToSource(self.volunteer_view.currentIndex()).row()
+                self.vol_name=self.volunteer_table[index_model_row]['name'].decode()
+            else:
+                self.vol_name = self.volunteer_table[0]['name'].decode()
+        else:
+            self.vol_name = ''
+        self.timeline_model_vol = TimeLineModel(self.h5file, view_type=self.vol_name)
+
+
+        self.timeline_needed.setModel(self.timeline_model_needed)
+        self.timeline_filled.setModel(self.timeline_model_filled)
+        self.timeline_vol.setModel(self.timeline_model_vol)
 
     def setup_ui(self):
 
@@ -1753,7 +2162,7 @@ class GeVT(QtCore.QObject):
         return {'name': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=3),
          'day': tables.Time32Col(shape=(), dflt=0, pos=1),
          'idnumber': tables.Int64Col(shape=(), dflt=0, pos=0),
-         'task_type': tables.EnumCol(enum=tables.Enum({'welcoming': 0, 'balisage': 1, 'logistics': 2, 'security': 3, 'race': 4, 'other': 5}), dflt='welcoming', base=tables.Int32Atom(shape=(), dflt=0), shape=(), pos=2),
+         'task_type': tables.EnumCol(enum=tables.Enum({'welcoming': 0, 'balisage': 1, 'logistics': 2, 'security': 3, 'race': 4, 'other': 5, 'unknown': 6, 'raid':7, 'trail':8, 'canoe':9, 'CO':10, 'VTT':11, 'rando':12}), dflt='welcoming', base=tables.Int32Atom(shape=(), dflt=0), shape=(), pos=2),
          'time_start': tables.Time32Col(shape=(), dflt=0, pos=4),
          'time_end': tables.Time32Col(shape=(), dflt=0, pos=5),
          'N_needed': tables.Int8Col(shape=(), dflt=0, pos=6),
@@ -1812,12 +2221,11 @@ class GeVT(QtCore.QObject):
             self.h5file.root._v_attrs['event_day'] = event_day
             if self.h5file.root._v_attrs['Ndays'] != Ndays:
                 self.h5file.root._v_attrs['Ndays'] = Ndays
-
-
-
                 self.h5file.remove_node('/volunteers','volunteer_table')
                 self.volunteer_table = self.h5file.create_table('/volunteers', 'volunteer_table', self.get_volunteer_description(Ndays), "List of volunteers")
-
+                for row in self.task_table:
+                    self.task_table.cols.N_filled[row.nrow] = 0
+                    self.task_table.cols.affected_volunteers[row.nrow] = -1*np.ones((50,))
                 self.define_models()
 
 
@@ -1835,10 +2243,10 @@ class GeVT(QtCore.QObject):
             event_day = QtCore.QDateTime(self.gev_settings.child(('event_day')).value()).toSecsSinceEpoch() #stored as seconds from Epoch
             Ndays = self.gev_settings.child(('event_ndays')).value()
 
+            event_save_dir = Path(event_save_dir)
 
 
-
-            self.h5file = tables.open_file(os.path.join(event_save_dir,event_name+'.gev'), mode='w', title='List of Tasks and volunteers for RTA 2018')
+            self.h5file = tables.open_file(event_save_dir.joinpath(event_name+'.gev'), mode='w', title='List of Tasks and volunteers for RTA 2018')
             self.h5file.root._v_attrs['event_save_dir'] = event_save_dir
             self.h5file.root._v_attrs['event_name'] = event_name
             self.h5file.root._v_attrs['event_place'] = event_place
@@ -1899,26 +2307,38 @@ class GeVT(QtCore.QObject):
                 task = self.task_table.row
 
                 ind = task.nrow - 1
-                with open(str(file_path)) as csvfile:
+                with codecs.open(str(file_path), 'rb', 'utf-8') as csvfile:
                     reader = csv.reader(csvfile)
                     # reader = csv.reader(tsvfile, dialect='excel-tab')
                     header = next(reader, None)
-                    if len(header) != 6:
+                    if len(header) != 8:
                         msgBox = QtWidgets.QMessageBox()
                         msgBox.setText(
-                            "The number of columns in file is not adequate with the definition of tasks")
+                            "The number of columns in file ({:}) is not adequate with the definition of tasks (8 columns)".format(len(header)))
                         msgBox.exec()
                         return
 
                     for row in reader:
                         ind += 1
+                        if row[3] == '':
+                            d = QtCore.QDateTime()
+                            row[3] = d.fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).date().toString('dd/MM/yy')
+
                         task['day'] = int(parse(row[3], dayfirst=True).timestamp())
                         task['name'] = row[1].encode()
-                        task['task_type'] = self.task_table.get_enum('task_type')[row[0]]
+                        if row[0] == '':
+                            row[0] = 'unknown'
+                        task['task_type'] = self.task_table.get_enum('task_type')[row[0].lower()]
                         task['idnumber'] = ind
                         task['time_start'] = int(parse(row[3] + ' ' + row[4], dayfirst=True).timestamp())
+                        if row[2] == '':
+                            row[2] = 1
                         task['N_needed'] = int(row[2])
+                        if row[5] == '':
+                            row[5] = '23h59'
                         task['time_end'] = int(parse(row[3] + ' ' + row[5], dayfirst=True).timestamp())
+                        task['remarqs'] = row[6].encode()
+                        task['stuff_needed'] = row[7].encode()
                         task.append()
                     self.task_table.flush()
 
@@ -1946,9 +2366,9 @@ class GeVT(QtCore.QObject):
             if file_path != '':
                 vol = self.volunteer_table.row
                 ind = vol.nrow - 1
-                with open(str(file_path)) as csvfile:
+                with codecs.open(str(file_path), 'rb', 'utf-8') as csvfile:  #data = codecs.open(..., "rb", "utf-8")
                     #reader = csv.reader(tsvfile, dialect='excel-tab')
-                    reader = csv.reader(csvfile)
+                    reader = csv.reader(csvfile, dialect='excel',)
                     header_days = next(reader, None)
                     flag = True
                     if len(header_days)!= 2*Ndays+2:
@@ -1969,6 +2389,7 @@ class GeVT(QtCore.QObject):
                     next(reader, None)
                     for row in reader:
                         ind += 1
+                        #print(row[0])
                         vol['name'] = row[0].encode()
                         vol['remarqs'] = row[1].encode()
                         vol['time_start'] = [self.fill_in_time(header_days[ind], row[ind], time='start') for ind in
@@ -1976,9 +2397,9 @@ class GeVT(QtCore.QObject):
                         vol['time_end'] = [self.fill_in_time(header_days[ind], row[ind], time='end') for ind in
                                            range(3, 2 * Ndays + 2, 2)]
                         vol['idnumber'] = ind
-                        print(vol['name'])
-                        print(vol['time_start'])
-                        print(vol['time_end'])
+                        # print(vol['name'])
+                        # print(vol['time_start'])
+                        # print(vol['time_end'])
                         vol.append()
                 self.volunteer_table.flush()
 

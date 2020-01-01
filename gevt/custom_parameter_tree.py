@@ -1092,7 +1092,7 @@ class Combo_pb(QtWidgets.QWidget):
         self.add_pb=QtWidgets.QPushButton()
         self.add_pb.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/Labview_icons/Icon_Library/Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.add_pb.setIcon(icon3)
         self.hor_layout.addWidget(self.combo)
         self.hor_layout.addWidget(self.add_pb)
@@ -1335,7 +1335,7 @@ class ItemSelect_pb(QtWidgets.QWidget):
         self.add_pb=QtWidgets.QPushButton()
         self.add_pb.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/Labview_icons/Icon_Library/Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.add_pb.setIcon(icon3)
         self.hor_layout.addWidget(self.itemselect)
         self.hor_layout.addWidget(self.add_pb)
@@ -1510,7 +1510,7 @@ class file_browser(QtWidgets.QWidget):
             *path_file*       string      the pathname of the file
             =============== =========== ===========================
         """
-        self.base_path_edit.setPlainText(path_file)
+        self.base_path_edit.setPlainText(str(path_file))
 
     def get_value(self):
         """
@@ -1530,13 +1530,13 @@ class file_browser(QtWidgets.QWidget):
         """
 
         self.hor_layout=QtWidgets.QHBoxLayout()
-        self.base_path_edit=QtWidgets.QPlainTextEdit(self.path)
+        self.base_path_edit=QtWidgets.QPlainTextEdit(str(self.path))
         self.base_path_edit.setMaximumHeight(50)
         self.base_path_edit.setReadOnly(True)
         self.base_path_browse_pb=QtWidgets.QPushButton()
         self.base_path_browse_pb.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/Labview_icons/Icon_Library/Browse_Dir_Path.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/Browse_Dir_Path.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.base_path_browse_pb.setIcon(icon3)
         self.hor_layout.addWidget(self.base_path_edit)
 
@@ -1672,7 +1672,7 @@ class Plain_text_pb(QtWidgets.QWidget):
         self.add_pb=QtWidgets.QPushButton()
         self.add_pb.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/Labview_icons/Icon_Library/Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/icons/Icon_Library/Add2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.add_pb.setIcon(icon3)
         self.hor_layout.addWidget(self.text_edit)
 
