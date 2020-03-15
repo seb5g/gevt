@@ -1,0 +1,445 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S101",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.38701,
+          43.70839,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S102",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.383306,
+          43.715904,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S103",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.382453,
+          43.713658,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S104",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.377778,
+          43.713481,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S105",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.377255,
+          43.714117,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S106",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.371392,
+          43.710407,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S107",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.37092,
+          43.7107,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S108",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.365616,
+          43.708948,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S108 bis",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.365493,
+          43.708983,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S109",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.373313,
+          43.684229,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S109 bis\n",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.37673,
+          43.67861,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S110",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.38996,
+          43.67927,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S110bis",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.390111,
+          43.679369,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S111",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.391452,
+          43.680948,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S112",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.392048,
+          43.680624,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S113",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.394034,
+          43.682628,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S113bis",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.39416,
+          43.68267,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S114",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.399373,
+          43.68363,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S115",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.39973,
+          43.68501,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S116",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.399536,
+          43.685256,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S116bis",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.399638,
+          43.685315,
+          0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "S117",
+        "styleUrl": "#icon-1657-0288D1-nodesc",
+        "styleHash": "-5eff88c2",
+        "styleMapHash": {
+          "normal": "#icon-1657-0288D1-nodesc-normal",
+          "highlight": "#icon-1657-0288D1-nodesc-highlight"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.396538,
+          43.691121,
+          0
+        ]
+      }
+    }
+  ]
+}

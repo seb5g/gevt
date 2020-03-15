@@ -1,0 +1,37 @@
+Metadata-Version: 1.1
+Name: gevt
+Version: 0.1.12
+Summary: Gestionnaire de Volontaires et de Tâches
+Home-page: UNKNOWN
+Author: Sébastien Weber
+Author-email: seba.weber@gmail.com
+License: MIT
+Description: Gevt est un Gestionnaire de Volontaires et de TÃ¢ches Ã©crit en python pour faciliter la gestion d'Ã©vÃ©nements impliquant
+        l'attribution de bÃ©nÃ©voles (les volontaires) Ã  l'Ã©xÃ©cution de tÃ¢ches.
+        
+        GeVT est une interface utilisateur qui permet la gestion semi-automatisÃ©e d'Ã©vÃ©nements nÃ©cessitant des bÃ©nÃ©voles. Plus le nombre de tÃ¢ches Ã  effectuer et Ã  rÃ©partir parmis de nombreux bÃ©nÃ©voles est grand plus la gestion de l'affectation de ces tÃ¢ches devient complexe. GeVT permet de:
+        
+        * **Edition de la liste des tÃ¢ches** Ã  effectuer durant les diffÃ©rents jours de l'Ã©vÃ©nement. Importation depuis un fichier au format *csv* possible.
+        * **Edition de la liste des volontaires** (bÃ©nÃ©voles) et de leur disponibilitÃ©. Importation depuis un fichier au format *csv* possible.
+        * **Affectation d'un ou plusieurs bÃ©nÃ©voles** (selon le nombre nÃ©cessaire *N needed*) Ã  une tÃ¢che donnÃ©e selon leur disponibilitÃ©. Si un bÃ©nÃ©vole n'est pas disponible sur le crÃ©neau de la tÃ¢che, il n'apparait pas dans la liste des possibilitÃ©s.
+        * **Affectation d'une ou plusieurs tÃ¢ches** Ã  un bÃ©nÃ©vole. La liste des tÃ¢ches *affectables* est mise Ã  jour immÃ©diatement selon les tÃ¢ches prÃ©cÃ©demment sÃ©lectionnÃ©es et qui modifient la disponibilitÃ© du bÃ©nÃ©vole.
+        * **Timeline** pour voir l'Ã©tat des diffÃ©rentes affectations
+        * Edition automatique de fiches bÃ©nÃ©voles regroupant l'ensemble des tÃ¢ches qu'un bÃ©nvole devra effectuer.
+        
+        
+        GitHub repo: https://github.com/seb5g/gevt
+        
+        Pypi: *pip install gevt*
+        
+        Ecrit par SÃ©bastien Weber sous licence MIT
+        
+            
+        
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Environment :: Other Environment
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: User Interfaces
