@@ -1627,7 +1627,7 @@ class ListPicker(QtCore.QObject):
 
         pass
         if res == self.dialog.Accepted:
-            # save preset parameters in a xml file
+            # save managers parameters in a xml file
             return  [int(ind.data()) for ind in self.table_view.selectedIndexes() if ind.column()==0]
         else:
             return []
@@ -1745,7 +1745,7 @@ class VolunteerWidgetMapper(QtWidgets.QWidget):
         res = dialog.exec()
 
         if res == dialog.Accepted:
-            # save preset parameters in a xml file
+            # save managers parameters in a xml file
             return self.settings
         else:
             return None
@@ -1792,7 +1792,7 @@ class TaskWidgetMapper(QtWidgets.QWidget):
             N_filled = dat[names.index('N_filled')]
             remarqs = dat[names.index('remarqs')].decode()
             stuff = dat[names.index('stuff_needed')].decode()
-            responsable = dat[names.index('responsable')].decode()
+            #responsable = dat[names.index('responsable')]
             localisation = dat[names.index('localisation')].decode()
 
         else:
@@ -1836,7 +1836,7 @@ class TaskWidgetMapper(QtWidgets.QWidget):
 
             {'title': 'Remarqs:', 'name': 'remarqs', 'type': 'str', 'value': remarqs},
             {'title': 'Stuffs:', 'name': 'stuff', 'type': 'str', 'value': stuff},
-            {'title': 'Responsable:', 'name': 'responsable', 'type': 'str', 'value': responsable, 'readonly': True},
+            #{'title': 'Responsable:', 'name': 'responsable', 'type': 'str', 'value': responsable, 'readonly': True},
             {'title': 'Geolocalisation:', 'name': 'localisation', 'type': 'str', 'value': localisation,
                                         'tooltip': 'coordinates in the form (43.675548, 1.388145)'},
         ]}]
@@ -2333,7 +2333,7 @@ class GeVT(QtCore.QObject):
         res = dialog.exec()
 
         if res == dialog.Accepted:
-            # save preset parameters in a xml file
+            # save managers parameters in a xml file
             return self.gev_settings
         else:
             return None
@@ -2524,7 +2524,7 @@ class GeVT(QtCore.QObject):
                     if len(header) != 9:
                         msgBox = QtWidgets.QMessageBox()
                         msgBox.setText(
-                            "The number of columns in file ({:}) is not adequate with the definition of tasks (8 columns)".format(len(header)))
+                            "The number of columns in file ({:}) is not adequate with the definition of tasks (9 columns)".format(len(header)))
                         msgBox.exec()
                         return
 
@@ -2540,11 +2540,13 @@ class GeVT(QtCore.QObject):
                             row[0] = 'unknown'
                         task['task_type'] = self.task_table.get_enum('task_type')[row[0].lower()]
                         task['idnumber'] = ind
+                        if row[4] == '':
+                            row[4] = '6h00'
                         task['time_start'] = int(parse(row[3] + ' ' + row[4], dayfirst=True).timestamp())
                         if row[2] == '':
                             row[2] = 1
                         task['N_needed'] = int(row[2])
-                        if row[5] == '':
+                        if row[5] == ' ':
                             row[5] = '23h59'
                         task['time_end'] = int(parse(row[3] + ' ' + row[5], dayfirst=True).timestamp())
                         task['remarqs'] = row[6].encode()
