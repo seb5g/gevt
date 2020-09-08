@@ -1314,7 +1314,11 @@ class TaskModel(QtCore.QAbstractTableModel):
             row_data['remarqs'] = param.child('task_settings', 'remarqs').value().encode()
             row_data['stuff_needed'] = param.child('task_settings', 'stuff').value().encode()
             row_data['localisation'] = param.child('task_settings', 'localisation').value().encode()
-            row_data['responsable'] = param.child('task_settings', 'responsable').value().encode()
+            #row_data['responsable'] = param.child('task_settings', 'responsable').value().encode()
+            try:
+                row_data['responsable'] = self.task_table[row_index]['responsable']
+            except:
+                row_data['responsable'] = -1
             try:
                 row_data['affected_volunteers'] = self.task_table[row_index]['affected_volunteers']
             except:
