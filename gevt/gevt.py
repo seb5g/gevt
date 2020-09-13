@@ -1444,7 +1444,8 @@ class TaskModel(QtCore.QAbstractTableModel):
                                     elif isinstance(task[name], int):
                                         text(str(task[name]))
                                     elif isinstance(task[name], np.ndarray):
-                                        names = [self.volunteer_table[ind_row]['name'].decode() for ind_row in task[name] if ind_row!=-1]
+                                        names = [self.volunteer_table[self.volunteer_table.get_where_list("""(idnumber == {:})""".format(id))[0]
+                                                 ]['name'].decode() for id in task[name] if id!=-1]
                                         text(str(names))
                                     elif isinstance(task[name], bytes):
                                         text(task[name].decode())
