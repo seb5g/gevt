@@ -405,11 +405,12 @@ class VolunteerModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
 
             if self.list_ids is not None:
+                vol_row = \
+                self.volunteer_table.get_where_list("""(idnumber == {:})""".format(self.list_ids[index.row()]))[0]
                 if index.column() == 1:
-                    return self.volunteer_table[self.list_ids[index.row()]][index.column()].decode()
-
+                    return self.volunteer_table[vol_row][index.column()].decode()
                 elif index.column() == 0:  # idnumber
-                    return int(self.volunteer_table[self.list_ids[index.row()]][index.column()])
+                    return int(self.volunteer_table[vol_row][index.column()])
 
                 else:
                     ind_time = index.column() - 2
@@ -663,12 +664,12 @@ class VolunteerModel(QtCore.QAbstractTableModel):
             self.task_table.cols.N_filled[task_row] -= 1
             self.task_table.flush()
 
-            for ind_task, task_id_tmp in enumerate(self.volunteer_table[idvol]['affected_tasks']):
+            for ind_task, task_id_tmp in enumerate(self.volunteer_table[row_vol]['affected_tasks']):
                 if task_id_tmp == task_id:
                     break
-            tasks = self.volunteer_table.cols.affected_tasks[idvol]
+            tasks = self.volunteer_table.cols.affected_tasks[row_vol]
             tasks[ind_task] = -1
-            self.volunteer_table.cols.affected_tasks[idvol] = tasks
+            self.volunteer_table.cols.affected_tasks[row_vol] = tasks
             self.volunteer_table.flush()
             self.update_signal.emit()
 
@@ -1045,7 +1046,8 @@ class TaskModel(QtCore.QAbstractTableModel):
                 if index.isValid():
                     ind_col = self.names[index.column()]
                     if self.list_ids is not None:
-                        dat = self.task_table[self.list_ids[index.row()]][ind_col]
+                        task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(self.list_ids[index.row()]))[0]
+                        dat = self.task_table[task_row][ind_col]
                     else:
                         dat = self.task_table[index.row()][ind_col]
                     dat_type = self.task_table.coltypes[self.task_table.colnames[index.column()]]
@@ -1058,7 +1060,11 @@ class TaskModel(QtCore.QAbstractTableModel):
                         if index.column() == 10 or index.column() == 11: #affected volunteers or responsable
                             if isinstance(dat, np.ndarray):
                                 try:
-                                    return str([self.volunteer_table[ind]['name'].decode() for ind in dat if ind != -1])
+
+                                    return str([self.volunteer_table[
+                                                    self.volunteer_table.get_where_list("""(idnumber == {:})""".format(
+                                                        ind))[0]]['name'].decode() for ind
+                                                in dat if ind != -1])
                                 except:
                                     return ''
                             else:
@@ -1154,6 +1160,16 @@ class TaskModel(QtCore.QAbstractTableModel):
         return True, ''
 
 
+
+    def go_to(self, index):
+        task_id = index.sibling(index.row(), self.task_table.colnames.index('idnumber')).data()
+        task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(task_id))[0]
+        localisation = self.task_table[task_row]['localisation']
+
+        url = f'https://www.google.com/maps/search/?api=1&query={localisation.decode()}'
+
+        webbrowser.open(url)
+
     def add_volunteer(self, index, resp=False):
         task_id = index.sibling(index.row(), self.task_table.colnames.index('idnumber')).data()
         task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(task_id))[0]
@@ -1165,7 +1181,7 @@ class TaskModel(QtCore.QAbstractTableModel):
         volunteers = list.pick_dialog(add=True, select_extended=not resp)
 
         for idvol in volunteers:
-            row = self.volunteer_table.get_where_list("""(idnumber == {:})""".format(idvol))[0]
+            vol_row = self.volunteer_table.get_where_list("""(idnumber == {:})""".format(idvol))[0]
 
             for ind_vol, vol_id in enumerate(self.task_table[task_row]['affected_volunteers']):
                 if vol_id == -1:
@@ -1175,30 +1191,21 @@ class TaskModel(QtCore.QAbstractTableModel):
             self.task_table.cols.affected_volunteers[task_row] = vols
             if resp:
                 self.task_table.cols.responsable[task_row] = idvol
-            self.task_table.cols.N_filled[task_row] += 1
+            self.task_table.cols.N_filled[task_row] = np.sum([1 for vol in vols if vol!=-1 ])
             self.task_table.flush()
 
-            for ind_task, task_id_tmp in enumerate(self.volunteer_table[idvol]['affected_tasks']):
+            for ind_task, task_id_tmp in enumerate(self.volunteer_table[vol_row]['affected_tasks']):
                 if task_id_tmp == -1:
                     break
-            tasks = self.volunteer_table.cols.affected_tasks[idvol]
+            tasks = self.volunteer_table.cols.affected_tasks[vol_row]
             tasks[ind_task] = task_id
-            self.volunteer_table.cols.affected_tasks[idvol] = tasks
+            self.volunteer_table.cols.affected_tasks[vol_row] = tasks
             self.volunteer_table.flush()
         self.update_signal.emit()
 
         index_ul = self.createIndex(index.row(), 0)
         index_br = self.createIndex(index.row(), len(self.task_table.colnames)-1)
         self.dataChanged.emit(index_ul, index_br, [QtCore.Qt.DisplayRole for ind in range(len(self.task_table.colnames))])
-
-    def go_to(self, index):
-        task_id = index.sibling(index.row(), self.task_table.colnames.index('idnumber')).data()
-        task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(task_id))[0]
-        localisation = self.task_table[task_row]['localisation']
-
-        url = f'https://www.google.com/maps/search/?api=1&query={localisation.decode()}'
-
-        webbrowser.open(url)
 
     def remove_volunteer(self,index,select=True):
         """
@@ -1214,7 +1221,7 @@ class TaskModel(QtCore.QAbstractTableModel):
         """
         task_id = index.sibling(index.row(), self.task_table.colnames.index('idnumber')).data()
         task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(task_id))[0]
-        volunteers=[ind for ind in self.task_table[task_row]['affected_volunteers'] if ind != -1]
+        volunteers = [ind for ind in self.task_table[task_row]['affected_volunteers'] if ind != -1]
 
         if select:
             list = ListPicker(picker_type="volunteer", h5file=self.h5file, ids=volunteers)
@@ -1222,7 +1229,7 @@ class TaskModel(QtCore.QAbstractTableModel):
         else:
             ids = volunteers
         for idvol in ids:
-            row = self.volunteer_table.get_where_list("""(idnumber == {:})""".format(idvol))[0]
+            vol_row = self.volunteer_table.get_where_list("""(idnumber == {:})""".format(idvol))[0]
             vols = self.task_table.cols.affected_volunteers[task_row]
             resp_id = self.task_table.cols.responsable[task_row]
             # find the index corresponding to the picked name
@@ -1233,15 +1240,15 @@ class TaskModel(QtCore.QAbstractTableModel):
                 self.task_table.cols.responsable[task_row] = -1
             vols[ind_vol] = -1
             self.task_table.cols.affected_volunteers[task_row] = vols
-            self.task_table.cols.N_filled[task_row] -= 1
+            self.task_table.cols.N_filled[task_row] = np.sum([1 for vol in vols if vol!=-1 ])
             self.task_table.flush()
 
-            for ind_task, task_id_tmp in enumerate(self.volunteer_table[idvol]['affected_tasks']):
+            for ind_task, task_id_tmp in enumerate(self.volunteer_table[vol_row]['affected_tasks']):
                 if task_id_tmp == task_id:
                     break
-            tasks = self.volunteer_table.cols.affected_tasks[idvol]
+            tasks = self.volunteer_table.cols.affected_tasks[vol_row]
             tasks[ind_task] = -1
-            self.volunteer_table.cols.affected_tasks[idvol] = tasks
+            self.volunteer_table.cols.affected_tasks[vol_row] = tasks
             self.volunteer_table.flush()
             self.update_signal.emit()
 
