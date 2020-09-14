@@ -1068,7 +1068,8 @@ class TaskModel(QtCore.QAbstractTableModel):
                                 except:
                                     return ''
                             else:
-                                return self.volunteer_table[dat]['name'].decode() if dat != -1 else ''
+                                return self.volunteer_table[self.volunteer_table.get_where_list("""(idnumber == {:})""".format(
+                                                        dat))[0]]['name'].decode()
                         else:
                             return int(dat)
                     elif dat_type == 'string':
