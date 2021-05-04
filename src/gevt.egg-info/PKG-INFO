@@ -1,0 +1,42 @@
+Metadata-Version: 1.2
+Name: gevt
+Version: 0.1.13
+Summary: Gestionnaire de Volontaires et de Tâches
+Home-page: http://gevt.readthedocs.io
+Author: Sébastien Weber
+Author-email: sebastien.weber@cemes.fr
+License: MIT
+Description: Gevt est un Gestionnaire de Volontaires et de Tâches écrit en python pour faciliter la gestion d'événements impliquant
+        l'attribution de bénévoles (les volontaires) à l'éxécution de tâches.
+        
+        GeVT est une interface utilisateur qui permet la gestion semi-automatisée d'événements nécessitant des bénévoles. Plus le nombre de tâches à effectuer et à répartir parmis de nombreux bénévoles est grand plus la gestion de l'affectation de ces tâches devient complexe. GeVT permet de:
+        
+        * **Edition de la liste des tâches** à effectuer durant les différents jours de l'événement. Importation depuis un fichier au format *csv* possible.
+        * **Edition de la liste des volontaires** (bénévoles) et de leur disponibilité. Importation depuis un fichier au format *csv* possible.
+        * **Affectation d'un ou plusieurs bénévoles** (selon le nombre nécessaire *N needed*) à une tâche donnée selon leur disponibilité. Si un bénévole n'est pas disponible sur le créneau de la tâche, il n'apparait pas dans la liste des possibilités.
+        * **Affectation d'une ou plusieurs tâches** à un bénévole. La liste des tâches *affectables* est mise à jour immédiatement selon les tâches précédemment sélectionnées et qui modifient la disponibilité du bénévole.
+        * **Timeline** pour voir l'état des différentes affectations
+        * Edition automatique de fiches bénévoles regroupant l'ensemble des tâches qu'un bénvole devra effectuer.
+        
+        
+        GitHub repo: https://github.com/seb5g/gevt
+        
+        Pypi: *pip install gevt*
+        
+        Ecrit par Sébastien Weber sous licence MIT
+        
+            
+        
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Other Environment
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Human Machine Interfaces
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Classifier: License :: CeCILL-B Free Software License Agreement (CECILL-B)
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: User Interfaces
+Requires-Python: <3.9,>=3.7

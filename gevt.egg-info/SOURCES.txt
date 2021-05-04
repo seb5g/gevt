@@ -1,24 +1,8 @@
 README.md
 setup.py
-gevt/__init__.py
-gevt/custom_parameter_tree.py
-gevt/gevt (conflicted copy 2020-03-14 123144).py
-gevt/gevt.py
-gevt/version.py
 gevt.egg-info/PKG-INFO
 gevt.egg-info/SOURCES.txt
 gevt.egg-info/dependency_links.txt
 gevt.egg-info/entry_points.txt
 gevt.egg-info/requires.txt
 gevt.egg-info/top_level.txt
-gevt/examples/RTA2018.gev
-gevt/examples/__init__.py
-gevt/examples/populate_table.py
-gevt/examples/tasks.csv
-gevt/examples/volunteers.csv
-gevt/icons/QtDesigner_ressources_rc.py
-gevt/icons/__init__.py
-gevt/icons/Icons/Open.png
-gevt/icons/Icons/SaveAs_32.png
-gevt/icons/Icons/Save_32.png
-gevt/icons/Icons/__init__.py

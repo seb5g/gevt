@@ -1,6 +1,7 @@
 numpy
 yattag
 yawrap
-pyqtgraph==0.10
+pyqtgraph
+pymodaq
 python-dateutil
 tables

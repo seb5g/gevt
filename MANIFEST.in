@@ -1,0 +1,6 @@
+graft src
+include README.rst
+include LICENSE
+include src/gevt/VERSION
+recursive-include src/gevt *.png *.ico
+recursive-exclude src/gevt *.pyc

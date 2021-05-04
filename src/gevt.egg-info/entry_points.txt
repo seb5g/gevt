@@ -1,0 +1,3 @@
+[console_scripts]
+gevt = gevt.gevt:start_gevt
+

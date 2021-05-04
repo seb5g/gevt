@@ -17,18 +17,20 @@ from dateutil.parser import parse
 import csv
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from pyqtgraph.dockarea import DockArea, Dock
+from pyqtgraph.dockarea import Dock
+from pymodaq.daq_utils.gui_utils import DockArea
 from pyqtgraph.parametertree import Parameter, ParameterTree
 import pyqtgraph.parametertree.parameterTypes as pTypes
 from pyqtgraph import ColorMap
-import custom_parameter_tree as custom_tree
+
+from pymodaq.daq_utils.parameter import pymodaq_ptypes
 import json
 import tables
 import numpy as np
 import datetime
 from enum import Enum
 from pathlib import Path
-from icons import QtDesigner_ressources_rc
+from pymodaq.resources.QtDesigner_Ressources import QtDesigner_ressources_rc
 from yawrap import Doc
 import webbrowser
 import traceback
@@ -73,15 +75,18 @@ def getLineInfo():
 
 def import_points_geojson(filepath):
     path = Path(filepath)
-    signaleurs = dict([])
+    signaleurs = []
     if 'geojson' in path.suffix:
         with open(filepath) as file:
             data = json.load(file)
+
             for feat in data['features']:
                 if feat['type'] == 'Feature':
                     if feat['geometry']['type'] == 'Point':
-                        signaleurs[feat['properties']['name']] = ', '.join(
-                            [str(co) for co in feat['geometry']['coordinates'][1::-1]])
+                        sig = dict(name=feat['properties']['name'],
+                                   coordinates=', '.join([str(co) for co in feat['geometry']['coordinates'][1::-1]]),
+                                   description=feat['properties']['description'])
+                        signaleurs.append(sig)
     return signaleurs
 
 def odd_even(x):
@@ -333,13 +338,13 @@ class TimeLineModel(QtCore.QAbstractTableModel):
         except Exception as e:
             return QtCore.QVariant()
 
-    def headerData(self,section,orientation,role):
-        if role==QtCore.Qt.DisplayRole:
-            if orientation==QtCore.Qt.Horizontal:
-                d=datetime.datetime.fromtimestamp(self.time_start+60*section*self.time_step)
+    def headerData(self, section, orientation, role):
+        if role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
+                d = datetime.datetime.fromtimestamp(self.time_start + 60 * section * self.time_step)
                 return d.strftime('%H:%M')
             else:
-                d=datetime.datetime.fromtimestamp(self.days[section])
+                d = datetime.datetime.fromtimestamp(self.days[section])
                 return d.strftime('%A')
         else:
             return QtCore.QVariant()
@@ -2392,7 +2397,8 @@ class GeVT(QtCore.QObject):
             event_save_dir = Path(event_save_dir)
 
 
-            self.h5file = tables.open_file(event_save_dir.joinpath(event_name+'.gev'), mode='w', title='List of Tasks and volunteers for RTA 2018')
+            self.h5file = tables.open_file(event_save_dir.joinpath(event_name+'.gev'), mode='w', title='List of Tasks and volunteers for '+
+                                           event_name)
             self.h5file.root._v_attrs['event_save_dir'] = event_save_dir
             self.h5file.root._v_attrs['event_name'] = event_name
             self.h5file.root._v_attrs['event_place'] = event_place
@@ -2478,22 +2484,34 @@ class GeVT(QtCore.QObject):
         try:
             file_path = select_file(save=False, ext=['geojson'])
             if file_path != '':
+
                 task = self.task_table.row
                 ids = self.task_table.col('idnumber')
                 if ids.size != 0:
                     ind = max(self.task_table.col('idnumber'))
                 else:
                     ind = -1
+
+                day_int, result = QtWidgets.QInputDialog.getInt(None,
+                                                                'Which day of the event should these tasks applied?',
+                                              'Pick an day', value=1, min=1, max=self.h5file.root._v_attrs['Ndays'])
+                if not result:
+                    day_int = 1
+
                 points = import_points_geojson(file_path)
+
+                d = QtCore.QDateTime()
+                day = d.fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).date()
+                day = day.addDays(day_int - 1)
+                day = day.toString('dd/MM/yy')
 
                 for point in points:
                     ind += 1
-                    d = QtCore.QDateTime()
-                    day = d.fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).date().toString('dd/MM/yy')
+
 
                     task['day'] = int(parse(day, dayfirst=True).timestamp())
-                    task['name'] = point
-                    if 'S' in point:
+                    task['name'] = point['name']
+                    if 'S' in point['name']:
                         pt_type = 'security'
                     else:
                         pt_type = 'logistics'
@@ -2503,10 +2521,10 @@ class GeVT(QtCore.QObject):
                     task['N_needed'] = 1
                     stop = '23h00'
                     task['time_end'] = int(parse(day + ' ' + stop, dayfirst=True).timestamp())
-                    task['remarqs'] = ''.encode()
+                    task['remarqs'] = point['description'].encode()
                     task['stuff_needed'] = ''.encode()
                     task['responsable'] = -1
-                    task['localisation'] = points[point].encode()
+                    task['localisation'] = point['coordinates'].encode()
                     task.append()
 
                 self.task_table.flush()
@@ -2696,24 +2714,15 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.closing.emit(event)
 
 
-#%%
 
 def start_gevt():
     import sys
     app = QtWidgets.QApplication(sys.argv)
-
     win = MyMainWindow()
-
     prog = GeVT(win)
     win.show()
+    sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-
-    win = MyMainWindow()
-
-    prog = GeVT(win)
-    win.show()
-
-    sys.exit(app.exec_())
+    start_gevt()
