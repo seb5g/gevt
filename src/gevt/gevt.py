@@ -83,9 +83,13 @@ def import_points_geojson(filepath):
             for feat in data['features']:
                 if feat['type'] == 'Feature':
                     if feat['geometry']['type'] == 'Point':
+                        if 'description' not in feat['properties']:
+                            desc = ''
+                        else:
+                            desc = feat['properties']['description']
                         sig = dict(name=feat['properties']['name'],
                                    coordinates=', '.join([str(co) for co in feat['geometry']['coordinates'][1::-1]]),
-                                   description=feat['properties']['description'])
+                                   description=desc)
                         signaleurs.append(sig)
     return signaleurs
 
@@ -2085,7 +2089,7 @@ class GeVT(QtCore.QObject):
 
     def __init__(self,mainwindow):
         super(GeVT, self).__init__()
-        cwd= os.getcwd()
+        cwd = os.getcwd()
         params = [{'title': 'Event Name:', 'name': 'event_name', 'type': 'str' , 'value': 'Mon_raid'},
                   {'title': 'Event Place:', 'name': 'event_place', 'type': 'str', 'value': 'Chez ouam'},
                   {'title': 'Event Start Date:', 'name': 'event_day', 'type': 'date'},
@@ -2510,7 +2514,7 @@ class GeVT(QtCore.QObject):
 
 
                     task['day'] = int(parse(day, dayfirst=True).timestamp())
-                    task['name'] = point['name']
+                    task['name'] = point['name'].encode()
                     if 'S' in point['name']:
                         pt_type = 'security'
                     else:
