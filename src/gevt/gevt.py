@@ -2564,31 +2564,32 @@ class GeVT(QtCore.QObject):
                         return
 
                     for row in reader:
-                        ind += 1
-                        if row[3] == '':
-                            d = QtCore.QDateTime()
-                            row[3] = d.fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).date().toString('dd/MM/yy')
+                        if row[0].lower() in self.task_table.get_enum('task_type'):
+                            ind += 1
+                            if row[3] == '':
+                                d = QtCore.QDateTime()
+                                row[3] = d.fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).date().toString('dd/MM/yy')
 
-                        task['day'] = int(parse(row[3], dayfirst=True).timestamp())
-                        task['name'] = row[1].encode()
-                        if row[0] == '':
-                            row[0] = 'unknown'
-                        task['task_type'] = self.task_table.get_enum('task_type')[row[0].lower()]
-                        task['idnumber'] = ind
-                        if row[4] == '':
-                            row[4] = '6h00'
-                        task['time_start'] = int(parse(row[3] + ' ' + row[4], dayfirst=True).timestamp())
-                        if row[2] == '':
-                            row[2] = 1
-                        task['N_needed'] = int(row[2])
-                        if row[5] == ' ':
-                            row[5] = '23h59'
-                        task['time_end'] = int(parse(row[3] + ' ' + row[5], dayfirst=True).timestamp())
-                        task['remarqs'] = row[6].encode()
-                        task['stuff_needed'] = row[7].encode()
-                        task['responsable'] = -1
-                        task['localisation'] = row[8].encode()
-                        task.append()
+                            task['day'] = int(parse(row[3], dayfirst=True).timestamp())
+                            task['name'] = row[1].encode()
+                            if row[0] == '':
+                                row[0] = 'unknown'
+                            task['task_type'] = self.task_table.get_enum('task_type')[row[0].lower()]
+                            task['idnumber'] = ind
+                            if row[4] == '':
+                                row[4] = '6h00'
+                            task['time_start'] = int(parse(row[3] + ' ' + row[4], dayfirst=True).timestamp())
+                            if row[2] == '':
+                                row[2] = 1
+                            task['N_needed'] = int(row[2])
+                            if row[5] == ' ':
+                                row[5] = '23h59'
+                            task['time_end'] = int(parse(row[3] + ' ' + row[5], dayfirst=True).timestamp())
+                            task['remarqs'] = row[6].encode()
+                            task['stuff_needed'] = row[7].encode()
+                            task['responsable'] = -1
+                            task['localisation'] = row[8].encode()
+                            task.append()
                     self.task_table.flush()
 
                 if QtCore.QDateTime(self.gev_settings.child(('event_day')).value()).toSecsSinceEpoch() != min(self.task_table[:]['day']):
@@ -2644,20 +2645,21 @@ class GeVT(QtCore.QObject):
 
                     next(reader, None)
                     for row in reader:
-                        ind += 1
-                        #print(row[0])
-                        vol['name'] = row[0].encode()
-                        vol['telephone'] = row[1].encode()
-                        vol['remarqs'] = row[2].encode()
-                        vol['time_start'] = [self.fill_in_time(header_days[ind], row[ind], time='start') for ind in
-                                             range(3, 2 * Ndays + 2, 2)]
-                        vol['time_end'] = [self.fill_in_time(header_days[ind], row[ind], time='end') for ind in
-                                           range(4, 2 * Ndays + 3, 2)]
-                        vol['idnumber'] = ind
-                        # print(vol['name'])
-                        # print(vol['time_start'])
-                        # print(vol['time_end'])
-                        vol.append()
+                        if row[0] != "":
+                            ind += 1
+                            #print(row[0])
+                            vol['name'] = row[0].encode()
+                            vol['telephone'] = row[1].encode()
+                            vol['remarqs'] = row[2].encode()
+                            vol['time_start'] = [self.fill_in_time(header_days[ind], row[ind], time='start') for ind in
+                                                 range(3, 2 * Ndays + 2, 2)]
+                            vol['time_end'] = [self.fill_in_time(header_days[ind], row[ind], time='end') for ind in
+                                               range(4, 2 * Ndays + 3, 2)]
+                            vol['idnumber'] = ind
+                            # print(vol['name'])
+                            # print(vol['time_start'])
+                            # print(vol['time_end'])
+                            vol.append()
                 self.volunteer_table.flush()
 
             self.define_models()
@@ -2681,10 +2683,11 @@ class GeVT(QtCore.QObject):
             try:
                 return int(parse(header_day + ' ' + string, dayfirst=True).timestamp())
             except:
-                if time == 'start':
-                    return int(parse(header_day + ' ' + '00:00:00', dayfirst=True).timestamp())
-                else:
-                    return int(parse(header_day + ' ' + '23:59:59', dayfirst=True).timestamp())
+                return -1
+                # if time == 'start':
+                #     return int(parse(header_day + ' ' + '00:00:00', dayfirst=True).timestamp())
+                # else:
+                #     return int(parse(header_day + ' ' + '23:59:59', dayfirst=True).timestamp())
 
     # %%
 

@@ -120,3 +120,4 @@ venv.bak/
 
 .tox
 *.h5
+src/gevt.egg-info/PKG-INFO
