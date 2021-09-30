@@ -4,7 +4,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
-
+*.pyc
 
 *.py[cod]
 *$py.class
@@ -121,3 +121,4 @@ venv.bak/
 .tox
 *.h5
 src/gevt.egg-info/PKG-INFO
+src/gevt/__pycache__/gevt.cpython-38.pyc

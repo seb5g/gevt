@@ -423,8 +423,8 @@ class VolunteerModel(QtCore.QAbstractTableModel):
 
                 else:
                     ind_time = index.column() - 2
-                    start = self.volunteer_table[index.row()]['time_start'][ind_time]
-                    stop = self.volunteer_table[index.row()]['time_end'][ind_time]
+                    start = self.volunteer_table[self.list_ids[index.row()]]['time_start'][ind_time]
+                    stop = self.volunteer_table[self.list_ids[index.row()]]['time_end'][ind_time]
                     if not (start == -1 or stop == -1):
                         s = datetime.datetime.fromtimestamp(start).strftime(
                             '%H:%M') + ' -> ' + datetime.datetime.fromtimestamp(stop).strftime('%H:%M')
@@ -1485,12 +1485,12 @@ class ListPicker(QtCore.QObject):
         self.add = True  # True if pick dialog is called to add some element of the list,
 
         if h5file is not None:
-            self.task_table=self.h5file.get_node('/tasks/tasks_table')
-            self.volunteer_table=self.h5file.get_node('/volunteers/volunteer_table')
+            self.task_table = self.h5file.get_node('/tasks/tasks_table')
+            self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
         else:
             raise Exception('No valid h5 file')
         if row is not None and ts is not None and te is not None:
-            self.list_ids = self.check_availlable(row,ts,te)
+            self.list_ids = self.check_availlable(row, ts, te)
         else:
             self.list_ids = ids
 
@@ -1533,7 +1533,7 @@ class ListPicker(QtCore.QObject):
                                         task['idnumber'] in affected_tasks_ids]
                 #TODO check if below is correct in differents  cases
                 test = []
-                for ind in range (vol_row['time_start'].size):
+                for ind in range(vol_row['time_start'].size):
                     overlap = get_overlap([time_start, time_end], [vol_row['time_start'][ind], vol_row['time_end'][ind]])
                     test.append(overlap >= (time_end - time_start))
                 #µtest = np.stack((time_start >= vol_row['time_start'], time_end <= vol_row['time_end']))  # test if this task (time_start,time_send) is compatible with volunteer presence
@@ -2401,7 +2401,7 @@ class GeVT(QtCore.QObject):
             event_save_dir = Path(event_save_dir)
 
 
-            self.h5file = tables.open_file(event_save_dir.joinpath(event_name+'.gev'), mode='w', title='List of Tasks and volunteers for '+
+            self.h5file = tables.open_file(str(event_save_dir.joinpath(event_name+'.gev')), mode='w', title='List of Tasks and volunteers for '+
                                            event_name)
             self.h5file.root._v_attrs['event_save_dir'] = event_save_dir
             self.h5file.root._v_attrs['event_name'] = event_name
