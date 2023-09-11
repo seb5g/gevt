@@ -17,13 +17,11 @@ from dateutil.parser import parse
 import csv
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from pyqtgraph.dockarea import Dock
-from pymodaq.daq_utils.gui_utils import DockArea
-from pyqtgraph.parametertree import Parameter, ParameterTree
-import pyqtgraph.parametertree.parameterTypes as pTypes
+from pymodaq.utils.gui_utils import DockArea, Dock
+
 from pyqtgraph import ColorMap
 
-from pymodaq.daq_utils.parameter import pymodaq_ptypes
+from pymodaq.utils.parameter import pymodaq_ptypes, ParameterTree, Parameter
 import json
 import tables
 import numpy as np
@@ -41,6 +39,7 @@ import logging
 col_task_header = ['Task Id', 'day', 'type', 'name', 'time start', 'time end', 'N needed', 'N filled', 'remarqs',
                    'stuff needed', 'affected volunteers', 'responsable', 'localisation']
 col_volunteer_header = ['Vol. Id', 'name', 'remarqs', 'affected tasks', 'telephone']
+
 
 def get_set_local_dir(basename='pymodaq_local'):
     if 'win32' in sys.platform:
@@ -1809,7 +1808,10 @@ class TaskWidgetMapper(QtWidgets.QWidget):
             task_type = self.task_table.get_enum('task_type')(dat[names.index('task_type')])
             N_needed = dat[names.index('N_needed')]
             N_filled = dat[names.index('N_filled')]
-            remarqs = dat[names.index('remarqs')].decode()
+            try:
+                remarqs = dat[names.index('remarqs')].decode()
+            except UnicodeDecodeError:
+                remarqs = str(dat[names.index('remarqs')])
             stuff = dat[names.index('stuff_needed')].decode()
             #responsable = dat[names.index('responsable')]
             localisation = dat[names.index('localisation')].decode()

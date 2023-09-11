@@ -122,3 +122,6 @@ venv.bak/
 *.h5
 src/gevt.egg-info/PKG-INFO
 src/gevt/__pycache__/gevt.cpython-38.pyc
+src/gevt.egg-info/entry_points.txt
+src/gevt.egg-info/PKG-INFO
+src/gevt.egg-info/SOURCES.txt

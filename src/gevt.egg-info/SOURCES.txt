@@ -3,7 +3,9 @@ MANIFEST.in
 README.md
 setup.cfg
 setup.py
+src/gevt/VERSION
 src/gevt/Mon_raid.gev
+src/gevt/RTA2021.gev
 src/gevt/VERSION
 src/gevt/__init__.py
 src/gevt/custom_parameter_tree.py
