@@ -1111,7 +1111,7 @@ class TaskModel(QtCore.QAbstractTableModel):
         except Exception as e:
             self.update_status(getLineInfo() + str(e))
 
-    def edit_data(self,index):
+    def edit_data(self, index):
         task_id = index.sibling(index.row(), self.task_table.colnames.index('idnumber')).data()
         task_row = self.task_table.get_where_list("""(idnumber == {:})""".format(task_id))[0]
         mapper = TaskWidgetMapper(self.h5file, task_row)
@@ -1783,13 +1783,10 @@ class TaskWidgetMapper(QtWidgets.QWidget):
     task_table     Table type from pytables module containing tasks for this event
     row            Row index within the table. Used to initialize data of
                    the widget.
-
     """
     
-    def __init__(self, h5file=None,row=None):
-
-        
-        super(TaskWidgetMapper,self).__init__()
+    def __init__(self, h5file=None, row=None):
+        super().__init__()
         self.h5file = h5file
         self.task_table = h5file.get_node('/tasks/tasks_table')
         self.row = row
@@ -1887,6 +1884,7 @@ class TaskWidgetMapper(QtWidgets.QWidget):
             return self.settings
         else:
             return None
+
 
 class TaskWidget(QtWidgets.QTableView):
 
@@ -2596,7 +2594,7 @@ class GeVT(QtCore.QObject):
                     msgBox = QtWidgets.QMessageBox()
                     msgBox.setText("The day filled in the table is not compatible with the starting date of the event")
                     msgBox.exec()
-                    self.task_table.remove_rows(0,self.task_table.nrows,1)
+                    self.task_table.remove_rows(0, self.task_table.nrows, 1)
                     return
 
                 self.define_models()
