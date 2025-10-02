@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: gevt
 Version: 0.1.16
 Summary: Gestionnaire de Volontaires et de Tâches
@@ -16,8 +16,12 @@ Classifier: License :: CeCILL-B Free Software License Agreement (CECILL-B)
 Classifier: Operating System :: OS Independent
 Classifier: Topic :: Software Development :: Libraries :: Python Modules
 Classifier: Topic :: Software Development :: User Interfaces
-Requires-Python: <3.11,>=3.7
+Requires-Python: >3.7
 License-File: LICENSE
+Requires-Dist: pymodaq_utils
+Requires-Dist: pymodaq_gui
+Requires-Dist: pyqt6
+Dynamic: license-file
 
 Gevt est un Gestionnaire de Volontaires et de Tâches écrit en python pour faciliter la gestion d'événements impliquant
 l'attribution de bénévoles (les volontaires) à l'éxécution de tâches.

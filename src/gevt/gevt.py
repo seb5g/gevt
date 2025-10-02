@@ -15,20 +15,20 @@ sys.path.append(path_here)
 
 from dateutil.parser import parse
 import csv
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from pymodaq.utils.gui_utils import DockArea, Dock
+from qtpy import QtWidgets, QtCore, QtGui
+from qtpy.QtCore import Signal, Slot
+from pymodaq_gui.utils import DockArea, Dock
 
 from pyqtgraph import ColorMap
 
-from pymodaq.utils.parameter import pymodaq_ptypes, ParameterTree, Parameter
+from pymodaq_gui.parameter import ParameterTree, Parameter
 import json
 import tables
 import numpy as np
 import datetime
 from enum import Enum
 from pathlib import Path
-from pymodaq.resources.QtDesigner_Ressources import QtDesigner_ressources_rc
+
 from yawrap import Doc
 import webbrowser
 import traceback
@@ -370,7 +370,7 @@ class TimeLineModel(QtCore.QAbstractTableModel):
 
 
 class VolunteerModel(QtCore.QAbstractTableModel):
-    update_signal = pyqtSignal()
+    update_signal = Signal()
 
     def __init__(self, h5file=None, Ndays=1, list_ids=None):
         super(VolunteerModel, self).__init__()
@@ -457,28 +457,31 @@ class VolunteerModel(QtCore.QAbstractTableModel):
             return QtCore.QVariant()
 
     def headerData(self, section, orientation, role):
-        self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
-        if role == QtCore.Qt.DisplayRole:
-            if orientation == QtCore.Qt.Horizontal:
-                if self.list_ids is not None:
-                    if section <= 1:
-                        return col_volunteer_header[section]
+        try:
+            self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
+            if role == QtCore.Qt.DisplayRole:
+                if orientation == QtCore.Qt.Horizontal:
+                    if self.list_ids is not None:
+                        if section <= 1:
+                            return col_volunteer_header[section]
+                        else:
+                            try:
+                                return 'Day {:02d}:'.format(section - 2)
+                            except:
+                                return QtCore.QVariant()
                     else:
-                        try:
-                            return 'Day {:02d}:'.format(section - 2)
-                        except:
-                            return QtCore.QVariant()
+                        if section <= 4:
+                            return col_volunteer_header[section]
+                        else:
+                            try:
+                                return 'Day {:02d}:'.format(section - 4)
+                            except:
+                                return QtCore.QVariant()
                 else:
-                    if section <= 4:
-                        return col_volunteer_header[section]
-                    else:
-                        try:
-                            return 'Day {:02d}:'.format(section - 4)
-                        except:
-                            return QtCore.QVariant()
+                    return QtCore.QVariant()
             else:
                 return QtCore.QVariant()
-        else:
+        except tables.exceptions.ClosedFileError:
             return QtCore.QVariant()
 
     def edit_data(self, index):
@@ -1009,7 +1012,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
 
 class TaskModel(QtCore.QAbstractTableModel):
 
-    update_signal=pyqtSignal()
+    update_signal=Signal()
 
     def __init__(self, h5file=None, list_ids=None):
         super(TaskModel, self).__init__()
@@ -1038,7 +1041,12 @@ class TaskModel(QtCore.QAbstractTableModel):
         if self.list_ids is not None:
             return len(self.list_ids)
         else:
-            return self.task_table.nrows
+
+            try:
+                self.task_table = self.h5file.get_node('/tasks/tasks_table')
+                return self.task_table.nrows
+            except tables.exceptions.ClosedFileError:
+                return 0
 
     
     def columnCount(self,index):
@@ -1849,7 +1857,7 @@ class TaskWidgetMapper(QtWidgets.QWidget):
             {'title': 'Time Start:', 'name': 'time_start', 'type': 'time', 'value': ts, 'minutes_increment': 30},
             {'title': 'Time End:', 'name': 'time_end', 'type': 'time', 'value': te, 'minutes_increment': 30},
             {'title': 'Task Type:', 'name': 'task_type', 'type': 'list', 'value': task_type,
-             'values': list(self.task_table.get_enum('task_type')._names.keys())},
+             'limits': list(self.task_table.get_enum('task_type')._names.keys())},
             {'title': 'Name:', 'name': 'name', 'type': 'str', 'value': name},
 
             {'title': 'N needed:', 'name': 'N_needed', 'type': 'int', 'value': N_needed, 'min': 0},
@@ -1959,7 +1967,7 @@ class TaskWidget(QtWidgets.QTableView):
 
 
 class VolunteerWidget(QtWidgets.QTableView):
-    index_changed_signal=pyqtSignal(QtCore.QModelIndex)
+    index_changed_signal=Signal(QtCore.QModelIndex)
 
     def currentChanged(self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex):
         self.index_changed_signal.emit(current)
@@ -2273,7 +2281,7 @@ class GeVT(QtCore.QObject):
         self.remove_filters_pb.clicked.connect(lambda: self.proxymodel.setTimeStampFilter(None)) #timestamp will be set to None and will be rendered ineficient
 
 
-    pyqtSlot(QtCore.QModelIndex)
+    Slot(QtCore.QModelIndex)
     def update_vol_label(self,index):
         try:
             row = index.model().mapToSource(index).row()
@@ -2311,7 +2319,7 @@ class GeVT(QtCore.QObject):
 
 
     def get_task_description(self):
-        return {'name': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=3),
+        return {'name': tables.StringCol(itemsize=2048, shape=(), dflt=b'', pos=3),
              'day': tables.Time32Col(shape=(), dflt=0, pos=1),
              'idnumber': tables.Int64Col(shape=(), dflt=0, pos=0),
              'task_type': tables.EnumCol(enum=tables.Enum({'welcoming': 0, 'balisage': 1, 'logistics': 2, 'security': 3, 'race': 4, 'other': 5, 'unknown': 6, 'raid':7, 'trail':8, 'canoe':9, 'CO':10, 'VTT':11, 'rando':12}), dflt='welcoming', base=tables.Int32Atom(shape=(), dflt=0), shape=(), pos=2),
@@ -2319,8 +2327,8 @@ class GeVT(QtCore.QObject):
              'time_end': tables.Time32Col(shape=(), dflt=0, pos=5),
              'N_needed': tables.Int8Col(shape=(), dflt=0, pos=6),
              'N_filled': tables.Int8Col(shape=(), dflt=0, pos=7),
-             'remarqs': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=8),
-             'stuff_needed': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=9),
+             'remarqs': tables.StringCol(itemsize=2048, shape=(), dflt=b'', pos=8),
+             'stuff_needed': tables.StringCol(itemsize=1024, shape=(), dflt=b'', pos=9),
              'affected_volunteers': tables.Int64Col(shape=(50,), dflt=-1, pos=10),
              'responsable': tables.Int16Col(shape=(), dflt=-1, pos=11),
              'localisation': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=12),}
@@ -2328,7 +2336,7 @@ class GeVT(QtCore.QObject):
     def get_volunteer_description(self,Ndays):
         return {'idnumber': tables.Int64Col(shape=(), dflt=0, pos=0),
              'name': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=1),
-             'remarqs': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=2),
+             'remarqs': tables.StringCol(itemsize=2048, shape=(), dflt=b'', pos=2),
              'affected_tasks': tables.Int64Col(shape=(50,), dflt=-1, pos=3),
              'telephone': tables.StringCol(itemsize=128, shape=(), dflt=b'', pos=4),
              'time_start': tables.Time32Col(shape=(Ndays,), dflt=0, pos=5),
@@ -2421,27 +2429,29 @@ class GeVT(QtCore.QObject):
             if self.h5file.isopen:
                 self.h5file.close()
                 
-        file_path = select_file(save=False, ext='gev')
-        self.h5file = tables.open_file(str(file_path), mode='a', title='List of Tasks and volunteers for RTA 2018')
-        self.task_table = self.h5file.get_node('/tasks/tasks_table')
-        self.volunteer_table=self.h5file.get_node('/volunteers/volunteer_table')
+        file_path = select_file(start_path=f'{os.environ['HOMEPATH']}\\Documents',
+                                save=False, ext='gev')
+        if file_path != '':
+            self.h5file = tables.open_file(str(file_path), mode='a', title='List of Tasks and volunteers for RTA 2018')
+            self.task_table = self.h5file.get_node('/tasks/tasks_table')
+            self.volunteer_table=self.h5file.get_node('/volunteers/volunteer_table')
 
-        event_save_dir = self.h5file.root._v_attrs['event_save_dir']
-        event_name = self.h5file.root._v_attrs['event_name']
-        event_place = self.h5file.root._v_attrs['event_place']
-        event_day = self.h5file.root._v_attrs['event_day']
-        Ndays = self.h5file.root._v_attrs['Ndays'] #stored as seconds from Epoch
+            event_save_dir = self.h5file.root._v_attrs['event_save_dir']
+            event_name = self.h5file.root._v_attrs['event_name']
+            event_place = self.h5file.root._v_attrs['event_place']
+            event_day = self.h5file.root._v_attrs['event_day']
+            Ndays = self.h5file.root._v_attrs['Ndays'] #stored as seconds from Epoch
 
-        self.gev_settings.child(('event_save_dir')).setValue(event_save_dir)
-        self.gev_settings.child(('event_name')).setValue(event_name)
-        self.gev_settings.child(('event_place')).setValue(event_place)
-        day=QtCore.QDateTime()
-        day.setSecsSinceEpoch(event_day)
-        self.gev_settings.child(('event_day')).setValue(day.date())
-        self.gev_settings.child(('event_ndays')).setValue(Ndays)
+            self.gev_settings.child(('event_save_dir')).setValue(event_save_dir)
+            self.gev_settings.child(('event_name')).setValue(event_name)
+            self.gev_settings.child(('event_place')).setValue(event_place)
+            day=QtCore.QDateTime()
+            day.setSecsSinceEpoch(event_day)
+            self.gev_settings.child(('event_day')).setValue(day.date())
+            self.gev_settings.child(('event_ndays')).setValue(Ndays)
 
-        if hasattr(self,'volunteer_view'): #this is the first step at initial load (before views are defined in init)
-            self.define_models()
+            if hasattr(self,'volunteer_view'): #this is the first step at initial load (before views are defined in init)
+                self.define_models()
 
     def save_file(self):
         if self.h5file.isopen:
@@ -2712,7 +2722,7 @@ class GeVT(QtCore.QObject):
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
-    closing = QtCore.pyqtSignal(QtGui.QCloseEvent)
+    closing = QtCore.Signal(QtGui.QCloseEvent)
 
     def __init__(self):
         super(MyMainWindow, self).__init__()
