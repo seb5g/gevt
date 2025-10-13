@@ -2429,7 +2429,7 @@ class GeVT(QtCore.QObject):
             if self.h5file.isopen:
                 self.h5file.close()
                 
-        file_path = select_file(start_path=f'{os.environ['HOMEPATH']}\\Documents',
+        file_path = select_file(start_path=f"{os.environ['HOMEPATH']}\\Documents",
                                 save=False, ext='gev')
         if file_path != '':
             self.h5file = tables.open_file(str(file_path), mode='a', title='List of Tasks and volunteers for RTA 2018')
