@@ -2,8 +2,9 @@
 name = "gevt"
 description = 'Event management to affect tasks to volunteers'
 dependencies = [
-    "pymodaq_utils==5.2.0a1",
-    "pymodaq_gui==5.2.0a1",
+    "pymodaq_utils>=5.2.0a1",
+    "pymodaq_data>=5.2.0a1",
+    "pymodaq_gui>=5.2.0a1",
     "pyqt5",
     "python-dateutil",
     "yawrap",
