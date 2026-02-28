@@ -90,11 +90,11 @@ class GeVT(CustomApp):
             self.h5file.close()
         event.setAccepted(True)
 
-    def quit(self):
+    def quit_fun(self):
         if self.h5file.isopen:
             self.h5file.close()
 
-        self.mainwindow.close()
+        super().quit_fun()
 
 
     def define_models(self):
@@ -612,7 +612,7 @@ class GeVT(CustomApp):
 
         self.connect_action('new_file', self.new_file)
         self.connect_action('show_log', self.show_log)
-        self.connect_action('quit', self.quit)
+        self.connect_action('quit', self.quit_fun)
 
         self.connect_action('import_tasks', self.import_task_csv)
         self.connect_action('import_volunteers', self.import_volunteer_csv)
