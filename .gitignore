@@ -128,3 +128,7 @@ src/gevt/__pycache__/gevt.cpython-38.pyc
 src/gevt.egg-info/entry_points.txt
 src/gevt.egg-info/PKG-INFO
 src/gevt.egg-info/SOURCES.txt
+.idea/gestion_benevoles.iml
+.idea/misc.xml
+.idea/workspace.xml
+src/gevt/Mon_raid.gev
