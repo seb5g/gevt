@@ -323,12 +323,12 @@ class GeVT(QtCore.QObject):
     def update_event_settings(self):
         res= self.show_event_dialog()
         if res is not None:
-            event_save_dir = self.gev_settings.child(('event_save_dir')).value()
-            event_name = self.gev_settings.child(('event_name')).value()
-            event_place = self.gev_settings.child(('event_place')).value()
+            event_save_dir = self.gev_settings['event_save_dir']
+            event_name = self.gev_settings['event_name']
+            event_place = self.gev_settings['event_place']
             event_day = QtCore.QDateTime(
-                self.gev_settings.child(('event_day')).value()).toSecsSinceEpoch()  # stored as seconds from Epoch
-            Ndays = self.gev_settings.child(('event_ndays')).value()
+                self.gev_settings['event_day']).toSecsSinceEpoch()  # stored as seconds from Epoch
+            Ndays = self.gev_settings['event_ndays']
 
             self.h5file.root._v_attrs['event_save_dir'] = event_save_dir
             self.h5file.root._v_attrs['event_name'] = event_name
@@ -352,11 +352,11 @@ class GeVT(QtCore.QObject):
 
         res= self.show_event_dialog()
         if res is not None:
-            event_save_dir = self.gev_settings.child(('event_save_dir')).value()
-            event_place = self.gev_settings.child(('event_place')).value()
-            event_name = self.gev_settings.child(('event_name')).value()
-            event_day = QtCore.QDateTime(self.gev_settings.child(('event_day')).value()).toSecsSinceEpoch() #stored as seconds from Epoch
-            Ndays = self.gev_settings.child(('event_ndays')).value()
+            event_save_dir = self.gev_settings['event_save_dir']
+            event_place = self.gev_settings['event_place']
+            event_name = self.gev_settings['event_name']
+            event_day = QtCore.QDateTime(self.gev_settings['event_day']).toSecsSinceEpoch() #stored as seconds from Epoch
+            Ndays = self.gev_settings['event_ndays']
 
             event_save_dir = Path(event_save_dir)
 
@@ -394,13 +394,13 @@ class GeVT(QtCore.QObject):
             event_day = self.h5file.root._v_attrs['event_day']
             Ndays = self.h5file.root._v_attrs['Ndays'] #stored as seconds from Epoch
 
-            self.gev_settings.child(('event_save_dir')).setValue(event_save_dir)
-            self.gev_settings.child(('event_name')).setValue(event_name)
-            self.gev_settings.child(('event_place')).setValue(event_place)
+            self.gev_settings.child('event_save_dir').setValue(event_save_dir)
+            self.gev_settings.child('event_name').setValue(event_name)
+            self.gev_settings.child('event_place').setValue(event_place)
             day=QtCore.QDateTime()
             day.setSecsSinceEpoch(event_day)
-            self.gev_settings.child(('event_day')).setValue(day.date())
-            self.gev_settings.child(('event_ndays')).setValue(Ndays)
+            self.gev_settings.child('event_day').setValue(day.date())
+            self.gev_settings.child('event_ndays').setValue(Ndays)
 
             if hasattr(self,'volunteer_view'): #this is the first step at initial load (before views are defined in init)
                 self.define_models()
@@ -554,7 +554,7 @@ class GeVT(QtCore.QObject):
                             task.append()
                     self.task_table.flush()
 
-                if QtCore.QDateTime(self.gev_settings.child(('event_day')).value()).toSecsSinceEpoch() != min(self.task_table[:]['day']):
+                if QtCore.QDateTime(self.gev_settings['event_day']).toSecsSinceEpoch() != min(self.task_table[:]['day']):
                     msgBox = QtWidgets.QMessageBox()
                     msgBox.setText("The day filled in the table is not compatible with the starting date of the event")
                     msgBox.exec()
@@ -574,7 +574,7 @@ class GeVT(QtCore.QObject):
     def import_volunteer_csv(self):
         try:
             file_path = select_file(save=False, ext=['csv', 'txt'])
-            Ndays = self.gev_settings.child(('event_ndays')).value()
+            Ndays = self.gev_settings['event_ndays']
             if file_path != '':
                 vol = self.volunteer_table.row
                 ids = self.volunteer_table.col('idnumber')
@@ -595,7 +595,7 @@ class GeVT(QtCore.QObject):
                         msgBox.exec()
 
                     if int(parse(header_days[3] + ' ' + '00:00:00', dayfirst=True).timestamp()) != QtCore.QDateTime(
-                            self.gev_settings.child(('event_day')).value()).toSecsSinceEpoch():
+                            self.gev_settings['event_day']).toSecsSinceEpoch():
                         flag = False
                         msgBox = QtWidgets.QMessageBox()
                         msgBox.setText(
