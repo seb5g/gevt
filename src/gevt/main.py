@@ -60,7 +60,7 @@ class GeVT(CustomApp):
 
         self.mainwindow.closing.connect(self.do_stuff_before_closing)
         self.h5file = None
-
+        self.create_event_dialog()
         res=self.show_dialog()
         if res:
             self.load_file()
@@ -250,29 +250,31 @@ class GeVT(CustomApp):
              'time_start': tables.Time32Col(shape=(Ndays,), dflt=0, pos=5),
              'time_end': tables.Time32Col(shape=(Ndays,), dflt=0, pos=6),}
 
-
-    def show_event_dialog(self):
-        dialog = QtWidgets.QDialog()
+    def create_event_dialog(self):
+        self.dialog = QtWidgets.QDialog(self.mainwindow)
         vlayout = QtWidgets.QVBoxLayout()
         vlayout.addWidget(self.settings_tree, 10)
-        dialog.setLayout(vlayout)
+        self.dialog.setLayout(vlayout)
 
-        buttonBox = QtWidgets.QDialogButtonBox(parent=dialog)
+        buttonBox = QtWidgets.QDialogButtonBox(parent=self.dialog)
         buttonBox.addButton('Apply', buttonBox.AcceptRole)
-        buttonBox.accepted.connect(dialog.accept)
+        buttonBox.accepted.connect(self.dialog.accept)
 
 
         vlayout.addWidget(buttonBox)
-        dialog.setWindowTitle('Fill in information about this Event')
-        res = dialog.exec()
+        self.dialog.setWindowTitle('Fill in information about this Event')
 
-        if res == dialog.Accepted:
+    def show_event_dialog(self):
+
+        res = self.dialog.exec()
+
+        if res == self.dialog.Accepted:
             # save managers parameters in a xml file
             return self.settings
         else:
             return None
 
-    def update_event_settings(self):
+    def show_event_settings(self):
         res= self.show_event_dialog()
         if res is not None:
             event_save_dir = self.settings['event_save_dir']
@@ -642,7 +644,7 @@ class GeVT(CustomApp):
         file_menu.addAction(self.get_action('quit'))
 
         settings_menu = menubar.addMenu('Settings')
-        settings_menu.addAction('Event configuration', self.update_event_settings)
+        settings_menu.addAction('Event configuration', self.show_event_settings)
 
         tools_menu = menubar.addMenu('Tools')
         tools_menu.addAction(self.get_action('import_tasks'))
