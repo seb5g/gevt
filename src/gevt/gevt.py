@@ -8,9 +8,7 @@ import sys
 import os
 from pathlib import Path
 import codecs
-path_here = os.path.split(__file__)[0]
-sys.path.append(path_here)
-
+path_here = Path(__file__)
 
 
 from dateutil.parser import parse
@@ -411,7 +409,6 @@ class VolunteerModel(QtCore.QAbstractTableModel):
     def data(self, index=QtCore.QModelIndex(), role=QtCore.Qt.DisplayRole):
         self.volunteer_table = self.h5file.get_node('/volunteers/volunteer_table')
         if role == QtCore.Qt.DisplayRole:
-
             if self.list_ids is not None:
                 vol_row = \
                 self.volunteer_table.get_where_list("""(idnumber == {:})""".format(self.list_ids[index.row()]))[0]
@@ -441,7 +438,7 @@ class VolunteerModel(QtCore.QAbstractTableModel):
                     return int(dat)
 
                 elif index.column() == 3: #affected tasks
-                    return str([val for val in self.volunteer_table[index.row()]['affected_tasks'] if val != -1])
+                    return str([int(val) for val in self.volunteer_table[index.row()]['affected_tasks'] if val != -1])
 
                 else:
                     ind_time = index.column() - 5
@@ -1076,10 +1073,8 @@ class TaskModel(QtCore.QAbstractTableModel):
                         if index.column() == 10 or index.column() == 11: #affected volunteers or responsable
                             if isinstance(dat, np.ndarray):
                                 try:
-
                                     return str([self.volunteer_table[
-                                                    self.volunteer_table.get_where_list("""(idnumber == {:})""".format(
-                                                        ind))[0]]['name'].decode() for ind
+                                                    self.volunteer_table.get_where_list(f"""(idnumber == {ind})""")[0]]['name'].decode() for ind
                                                 in dat if ind != -1])
                                 except:
                                     return ''
@@ -2152,7 +2147,7 @@ class GeVT(QtCore.QObject):
 
 
     def define_models(self):
-        self.volunteer_model = VolunteerModel(self.h5file, self.gev_settings.child(('event_ndays')).value())
+        self.volunteer_model = VolunteerModel(self.h5file, self.gev_settings['event_ndays'])
         self.volunteer_sortproxy = QtCore.QSortFilterProxyModel()
         self.volunteer_sortproxy.setSourceModel(self.volunteer_model)
         self.volunteer_view.setModel(self.volunteer_sortproxy)
