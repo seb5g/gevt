@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b846fea-0835-42c7-8907-34eae4eee776" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/gevt/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gevt/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gevt/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gevt/gevt.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gevt/custom_parameter_tree.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +121,7 @@
   "keyToString": {
     "Python.gevt.executor": "Debug",
     "Python.main (1).executor": "Debug",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "feature/refactoring__using__pymodaq__tools",
     "last_opened_file_path": "C:/Users/weber/Labo/ProgrammesPython/Git_others/gevt/gevt/src/gevt/volunteers"
   }
 }]]></component>
