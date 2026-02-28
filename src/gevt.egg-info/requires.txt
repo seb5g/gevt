@@ -1,3 +1,0 @@
-pymodaq_utils
-pymodaq_gui
-pyqt6

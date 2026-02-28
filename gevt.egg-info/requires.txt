@@ -1,7 +1,0 @@
-numpy
-yattag
-yawrap
-pyqtgraph
-pymodaq
-python-dateutil
-tables
