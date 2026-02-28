@@ -2,8 +2,8 @@
 name = "gevt"
 description = 'Event management to affect tasks to volunteers'
 dependencies = [
-    "pymodaq_utils",
-    "pymodaq_gui",
+    "pymodaq_utils==5.2.0a1",
+    "pymodaq_gui==5.2.0a1",
     "pyqt5",
     "python-dateutil",
     "yawrap",
@@ -46,7 +46,7 @@ Documentation  = "http://gevt.readthedocs.io"
 Issues = 'https://github.com/seb5g/gevt/issues'
 
 [project.scripts]
-gevt = "gevt.gevt:start_gevt"
+gevt = "gevt.main:start_gevt"
 
 [build-system]
 requires = [
