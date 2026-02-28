@@ -7,6 +7,21 @@ Created on Mon Sep 24 21:50:38 2018
 import os
 from pathlib import Path
 import codecs
+import numpy as np
+import datetime
+import logging
+
+from dateutil.parser import parse
+import csv
+
+
+from qtpy import QtWidgets, QtCore, QtGui
+from qtpy.QtCore import Slot
+
+from pymodaq_gui.utils import DockArea, Dock
+from pymodaq_gui.parameter import ParameterTree, Parameter
+from pymodaq_gui.utils.custom_app import CustomApp
+import tables
 
 from gevt.gui_utils import select_file, FilterProxyDayTypeCustom, MyMainWindow
 from gevt.tasks import TaskModel, TaskWidget
@@ -14,24 +29,8 @@ from gevt.timeline import TimeLineView, TimeLineModel
 from gevt.utils import get_set_local_dir, getLineInfo, import_points_geojson
 from gevt.volunteers import VolunteerModel, VolunteerWidget
 
+
 path_here = Path(__file__)
-
-
-from dateutil.parser import parse
-import csv
-from qtpy import QtWidgets, QtCore, QtGui
-from qtpy.QtCore import Slot
-from pymodaq_gui.utils import DockArea, Dock
-
-from pymodaq_gui.parameter import ParameterTree, Parameter
-import tables
-import numpy as np
-import datetime
-from pathlib import Path
-
-import logging
-
-
 local_path = get_set_local_dir('gevt_dir')
 now = datetime.datetime.now()
 log_path = os.path.join(local_path,'logging')
@@ -43,27 +42,21 @@ for handler in logging.root.handlers[:]:
 logging.basicConfig(filename=os.path.join(log_path, 'gevt_{}.log'.format(now.strftime('%Y%m%d_%H_%M_%S'))), level=logging.DEBUG)
 
 
-class GeVT(QtCore.QObject):
+class GeVT(CustomApp):
     """
     GeB: Gestion of volunteers user interface
     """
+    params = [{'title': 'Event Name:', 'name': 'event_name', 'type': 'str', 'value': 'Mon_raid'},
+              {'title': 'Event Place:', 'name': 'event_place', 'type': 'str', 'value': 'Chez ouam'},
+              {'title': 'Event Start Date:', 'name': 'event_day', 'type': 'date'},
+              {'title': 'Ndays:', 'name': 'event_ndays', 'type': 'int', 'min': 1,
+               'tooltip': 'Event duration in number of days'},
+              {'title': 'Save directory:', 'name': 'event_save_dir',
+               'type': 'browsepath', 'filetype': False, 'value': str(local_path)},
+              ]
 
-
-    def __init__(self,mainwindow):
-        super(GeVT, self).__init__()
-        cwd = os.getcwd()
-        params = [{'title': 'Event Name:', 'name': 'event_name', 'type': 'str' , 'value': 'Mon_raid'},
-                  {'title': 'Event Place:', 'name': 'event_place', 'type': 'str', 'value': 'Chez ouam'},
-                  {'title': 'Event Start Date:', 'name': 'event_day', 'type': 'date'},
-                  {'title': 'Ndays:', 'name': 'event_ndays', 'type': 'int', 'min':1, 'tooltip': 'Event duration in number of days'},
-                  {'title': 'Save directory:', 'name': 'event_save_dir', 'type': 'browsepath', 'filetype': False, 'value': cwd},
-        ]
-        self.gev_settings = Parameter.create(name='gev_settings', type='group', children=params)
-
-
-        self.mainwindow = mainwindow
-        self.area = DockArea()
-        self.mainwindow.setCentralWidget(self.area)
+    def __init__(self, area: DockArea):
+        super().__init__(parent=area)
 
         self.mainwindow.closing.connect(self.do_stuff_before_closing)
         self.h5file = None
@@ -105,7 +98,7 @@ class GeVT(QtCore.QObject):
 
 
     def define_models(self):
-        self.volunteer_model = VolunteerModel(self.h5file, self.gev_settings['event_ndays'])
+        self.volunteer_model = VolunteerModel(self.h5file, self.settings['event_ndays'])
         self.volunteer_sortproxy = QtCore.QSortFilterProxyModel()
         self.volunteer_sortproxy.setSourceModel(self.volunteer_model)
         self.volunteer_view.setModel(self.volunteer_sortproxy)
@@ -152,16 +145,7 @@ class GeVT(QtCore.QObject):
         self.timeline_filled.setModel(self.timeline_model_filled)
         self.timeline_vol.setModel(self.timeline_model_vol)
 
-    def setup_ui(self):
-
-        self.menubar=self.mainwindow.menuBar()
-        self.create_menu(self.menubar)
-
-
-        self.toolbar=QtWidgets.QToolBar()
-        self.create_toolbar()
-        self.mainwindow.addToolBar(self.toolbar)
-
+    def setup_docks(self):
         dock_time_line=Dock('TimeLine',size=(500,100))
         dock_task=Dock('List of Tasks', size=(600, 400))
         dock_volunteer=Dock('List of Volunteers', size=(400, 400))
@@ -184,8 +168,6 @@ class GeVT(QtCore.QObject):
 
         self.define_models()
 
-
-
         layout=QtWidgets.QHBoxLayout()
         filter_widget=QtWidgets.QWidget()
 
@@ -202,10 +184,6 @@ class GeVT(QtCore.QObject):
         layout.addWidget(self.remove_filters_pb)
         layout.addStretch(1)
         filter_widget.setLayout(layout)
-
-
-
-
 
         dock_task.addWidget(filter_widget)
         dock_task.addWidget(self.task_view)
@@ -225,10 +203,10 @@ class GeVT(QtCore.QObject):
         # self.html.show()
         #dock_html.addWidget(self.html)
 
-        self.area.addDock(dock_time_line, 'top')
-        self.area.addDock(dock_task,'bottom',dock_time_line)
-        self.area.addDock(dock_volunteer,'right',dock_time_line)
-        #self.area.addDock(dock_html,'below',dock_task)
+        self.dockarea.addDock(dock_time_line, 'top')
+        self.dockarea.addDock(dock_task,'bottom',dock_time_line)
+        self.dockarea.addDock(dock_volunteer,'right',dock_time_line)
+        #self.dockarea.addDock(dock_html,'below',dock_task)
         self.day_edit.textChanged.connect(self.proxymodel.setDayFilter)
         self.type_edit.textChanged.connect(self.proxymodel.setTypeFilter)
         self.remove_filters_pb.clicked.connect(lambda: self.proxymodel.setTimeStampFilter(None)) #timestamp will be set to None and will be rendered ineficient
@@ -247,28 +225,6 @@ class GeVT(QtCore.QObject):
     def show_log(self):
         import webbrowser
         webbrowser.open(logging.getLoggerClass().root.handlers[0].baseFilename)
-
-    def create_menu(self,menubar):
-        # %% create Settings menu
-        file_menu = menubar.addMenu('File')
-        file_menu.addAction('New file', self.new_file)
-        file_menu.addAction('Load file', self.load_file)
-        file_menu.addAction('Save', self.save_file)
-        file_menu.addAction('Save as', self.save_file_as)
-        file_menu.addSeparator()
-        file_menu.addAction('Show log file', self.show_log)
-        file_menu.addSeparator()
-        file_menu.addAction('Quit', self.quit)
-
-        settings_menu = menubar.addMenu('Settings')
-        settings_menu.addAction('Event configuration', self.update_event_settings)
-
-        tools_menu = menubar.addMenu('Tools')
-        tools_menu.addAction('Import Tasks from csv', self.import_task_csv)
-        tools_menu.addAction('Import Volunteers from csv', self.import_volunteer_csv)
-        tools_menu.addSeparator()
-        tools_menu.addAction('Geojson to csv', self.convert_geojson)
-
 
     def get_task_description(self):
         return {'name': tables.StringCol(itemsize=2048, shape=(), dflt=b'', pos=3),
@@ -298,14 +254,10 @@ class GeVT(QtCore.QObject):
     def show_event_dialog(self):
         dialog = QtWidgets.QDialog()
         vlayout = QtWidgets.QVBoxLayout()
-        self.settings_tree = ParameterTree()
         vlayout.addWidget(self.settings_tree, 10)
-        self.settings_tree.setMinimumWidth(300)
-
-        self.settings_tree.setParameters(self.gev_settings, showTop=True)
         dialog.setLayout(vlayout)
 
-        buttonBox = QtWidgets.QDialogButtonBox(parent=dialog);
+        buttonBox = QtWidgets.QDialogButtonBox(parent=dialog)
         buttonBox.addButton('Apply', buttonBox.AcceptRole)
         buttonBox.accepted.connect(dialog.accept)
 
@@ -316,19 +268,19 @@ class GeVT(QtCore.QObject):
 
         if res == dialog.Accepted:
             # save managers parameters in a xml file
-            return self.gev_settings
+            return self.settings
         else:
             return None
 
     def update_event_settings(self):
         res= self.show_event_dialog()
         if res is not None:
-            event_save_dir = self.gev_settings['event_save_dir']
-            event_name = self.gev_settings['event_name']
-            event_place = self.gev_settings['event_place']
+            event_save_dir = self.settings['event_save_dir']
+            event_name = self.settings['event_name']
+            event_place = self.settings['event_place']
             event_day = QtCore.QDateTime(
-                self.gev_settings['event_day']).toSecsSinceEpoch()  # stored as seconds from Epoch
-            Ndays = self.gev_settings['event_ndays']
+                self.settings['event_day']).toSecsSinceEpoch()  # stored as seconds from Epoch
+            Ndays = self.settings['event_ndays']
 
             self.h5file.root._v_attrs['event_save_dir'] = event_save_dir
             self.h5file.root._v_attrs['event_name'] = event_name
@@ -343,8 +295,6 @@ class GeVT(QtCore.QObject):
                     self.task_table.cols.affected_volunteers[row.nrow] = -1*np.ones((50,))
                 self.define_models()
 
-
-
     def new_file(self):
         if self.h5file is not None:
             if self.h5file.isopen:
@@ -352,11 +302,11 @@ class GeVT(QtCore.QObject):
 
         res= self.show_event_dialog()
         if res is not None:
-            event_save_dir = self.gev_settings['event_save_dir']
-            event_place = self.gev_settings['event_place']
-            event_name = self.gev_settings['event_name']
-            event_day = QtCore.QDateTime(self.gev_settings['event_day']).toSecsSinceEpoch() #stored as seconds from Epoch
-            Ndays = self.gev_settings['event_ndays']
+            event_save_dir = self.settings['event_save_dir']
+            event_place = self.settings['event_place']
+            event_name = self.settings['event_name']
+            event_day = QtCore.QDateTime(self.settings['event_day']).toSecsSinceEpoch() #stored as seconds from Epoch
+            Ndays = self.settings['event_ndays']
 
             event_save_dir = Path(event_save_dir)
 
@@ -394,13 +344,13 @@ class GeVT(QtCore.QObject):
             event_day = self.h5file.root._v_attrs['event_day']
             Ndays = self.h5file.root._v_attrs['Ndays'] #stored as seconds from Epoch
 
-            self.gev_settings.child('event_save_dir').setValue(event_save_dir)
-            self.gev_settings.child('event_name').setValue(event_name)
-            self.gev_settings.child('event_place').setValue(event_place)
+            self.settings.child('event_save_dir').setValue(event_save_dir)
+            self.settings.child('event_name').setValue(event_name)
+            self.settings.child('event_place').setValue(event_place)
             day=QtCore.QDateTime()
             day.setSecsSinceEpoch(event_day)
-            self.gev_settings.child('event_day').setValue(day.date())
-            self.gev_settings.child('event_ndays').setValue(Ndays)
+            self.settings.child('event_day').setValue(day.date())
+            self.settings.child('event_ndays').setValue(Ndays)
 
             if hasattr(self,'volunteer_view'): #this is the first step at initial load (before views are defined in init)
                 self.define_models()
@@ -554,7 +504,7 @@ class GeVT(QtCore.QObject):
                             task.append()
                     self.task_table.flush()
 
-                if QtCore.QDateTime(self.gev_settings['event_day']).toSecsSinceEpoch() != min(self.task_table[:]['day']):
+                if QtCore.QDateTime(self.settings['event_day']).toSecsSinceEpoch() != min(self.task_table[:]['day']):
                     msgBox = QtWidgets.QMessageBox()
                     msgBox.setText("The day filled in the table is not compatible with the starting date of the event")
                     msgBox.exec()
@@ -574,7 +524,7 @@ class GeVT(QtCore.QObject):
     def import_volunteer_csv(self):
         try:
             file_path = select_file(save=False, ext=['csv', 'txt'])
-            Ndays = self.gev_settings['event_ndays']
+            Ndays = self.settings['event_ndays']
             if file_path != '':
                 vol = self.volunteer_table.row
                 ids = self.volunteer_table.col('idnumber')
@@ -595,7 +545,7 @@ class GeVT(QtCore.QObject):
                         msgBox.exec()
 
                     if int(parse(header_days[3] + ' ' + '00:00:00', dayfirst=True).timestamp()) != QtCore.QDateTime(
-                            self.gev_settings['event_day']).toSecsSinceEpoch():
+                            self.settings['event_day']).toSecsSinceEpoch():
                         flag = False
                         msgBox = QtWidgets.QMessageBox()
                         msgBox.setText(
@@ -653,34 +603,61 @@ class GeVT(QtCore.QObject):
 
     # %%
 
-    def create_toolbar(self):
-        iconload = QtGui.QIcon()
-        iconload.addPixmap(QtGui.QPixmap(":/Icons/Icons/Open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.loadaction = QtWidgets.QAction(iconload, "Load GeV file (.gev)", None)
-        self.toolbar.addAction(self.loadaction)
-        self.loadaction.triggered.connect(self.load_file)
+    def connect_things(self):
+        self.connect_action('load_file', self.load_file)
+        self.connect_action('save_file', self.save_file)
+        self.connect_action('save_file_as', self.save_file_as)
 
-        iconsave = QtGui.QIcon()
-        iconsave.addPixmap(QtGui.QPixmap(":/Icons/Icons/Save_32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.saveaction = QtWidgets.QAction(iconsave, "Save", None)
-        self.toolbar.addAction(self.saveaction)
-        self.saveaction.triggered.connect(self.save_file)
+        self.connect_action('new_file', self.new_file)
+        self.connect_action('show_log', self.show_log)
+        self.connect_action('quit', self.quit)
 
-        iconsaveas = QtGui.QIcon()
-        iconsaveas.addPixmap(QtGui.QPixmap(":/Icons/Icons/SaveAs_32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.saveasaction = QtWidgets.QAction(iconsaveas, "Save As", None)
-        self.toolbar.addAction(self.saveasaction)
-        self.saveasaction.triggered.connect(self.save_file_as)
+        self.connect_action('import_tasks', self.import_task_csv)
+        self.connect_action('import_volunteers', self.import_volunteer_csv)
+
+    def setup_actions(self):
+        self.add_action('load_file', 'Load File', 'Open', tip="Load GeV file (.gev)")
+        self.add_action('save_file', 'Save File', 'save_as', tip="Save GeV file (.gev)")
+        self.add_action('save_file_as', 'Save File As', 'save_as', tip="Save GeV file (.gev) as...")
+
+        self.add_action('new_file', 'New File', '', auto_toolbar=False)
+        self.add_action('show_log', 'Show Log', '', auto_toolbar=False)
+        self.add_action('quit', 'Quit', 'close', auto_toolbar=False)
+
+        self.add_action('import_tasks', 'Import Tasks', '', auto_toolbar=False)
+        self.add_action('import_volunteers', 'Import Volunteers', '', auto_toolbar=False)
+
+    def setup_menu(self, menubar=None):
+        # %% create Settings menu
+        file_menu = menubar.addMenu('File')
+        file_menu.addAction(self.get_action('new_file'))
+        file_menu.addAction(self.get_action('load_file'))
+        file_menu.addAction(self.get_action('save_file'))
+        file_menu.addAction(self.get_action('save_file_as'))
+        file_menu.addSeparator()
+        file_menu.addAction(self.get_action('show_log'))
+        file_menu.addSeparator()
+        file_menu.addAction(self.get_action('quit'))
+
+        settings_menu = menubar.addMenu('Settings')
+        settings_menu.addAction('Event configuration', self.update_event_settings)
+
+        tools_menu = menubar.addMenu('Tools')
+        tools_menu.addAction(self.get_action('import_tasks'))
+        tools_menu.addAction(self.get_action('import_volunteers'))
+        tools_menu.addSeparator()
+        tools_menu.addAction('Geojson to csv', self.convert_geojson)
 
 
 def start_gevt():
     import sys
     from pymodaq_gui.utils.utils import mkQApp
     app = mkQApp('GeVT')
-
-    win = MyMainWindow()
-    prog = GeVT(win)
-    win.show()
+    main_window = MyMainWindow()
+    area = DockArea()
+    main_window.setCentralWidget(area)
+    prog = GeVT(area)
+    main_window.show()
 
     sys.exit(app.exec())
 
