@@ -388,11 +388,11 @@ class GeVT(CustomApp):
                 day = d.fromSecsSinceEpoch(self.h5file.root._v_attrs['event_day']).date().toString('dd/MM/yy')
 
                 for point in points:
-                    if 'S' in point:
+                    if 'S' in point['name']:
                         pt_type = 'security'
                     else:
                         pt_type = 'logistics'
-                    row = [pt_type, point, 1, day, '08:00', '18:00', '', '', points[point]]
+                    row = [pt_type, point['name'], 1, day, '08:00', '18:00', point['description'], '', point['coordinates']]
                     writer.writerow(row)
 
 
@@ -475,7 +475,7 @@ class GeVT(CustomApp):
                         msgBox.exec()
                         return
 
-                    for row in reader:
+                    for ind_reader, row in enumerate(reader):
                         if row[0].lower() in self.task_table.get_enum('task_type'):
                             ind += 1
                             if row[3] == '':
@@ -501,15 +501,17 @@ class GeVT(CustomApp):
                             task['stuff_needed'] = row[7].encode()
                             task['responsable'] = -1
                             task['localisation'] = row[8].encode()
-                            task.append()
-                    self.task_table.flush()
 
-                if QtCore.QDateTime(self.settings['event_day']).toSecsSinceEpoch() != min(self.task_table[:]['day']):
-                    msgBox = QtWidgets.QMessageBox()
-                    msgBox.setText("The day filled in the table is not compatible with the starting date of the event")
-                    msgBox.exec()
-                    self.task_table.remove_rows(0, self.task_table.nrows, 1)
-                    return
+                            event_day_timestamp = QtCore.QDateTime(self.settings['event_day']).toSecsSinceEpoch()
+                            n_days = self.settings['event_ndays']
+                            if event_day_timestamp <= task['day'] <= event_day_timestamp + n_days * 24 * 3600:
+                                task.append()
+                            else:
+                                msgBox = QtWidgets.QMessageBox()
+                                msgBox.setText(
+                                    f"The day filled in the csv (row {ind_reader}) is not compatible with the event days")
+                                msgBox.exec()
+                    self.task_table.flush()
 
                 self.define_models()
                 self.proxymodel = FilterProxyDayTypeCustom()
