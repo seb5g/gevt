@@ -46,7 +46,7 @@ Documentation  = "http://gevt.readthedocs.io"
 Issues = 'https://github.com/seb5g/gevt/issues'
 
 [project.scripts]
-gevt = "gevt.gevt:start_gevt"
+gevt = "gevt.main:start_gevt"
 
 [build-system]
 requires = [
