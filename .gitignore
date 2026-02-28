@@ -56,7 +56,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-*.idea
+.idea/
+
+*egg*
 
 # Translations
 *.mo

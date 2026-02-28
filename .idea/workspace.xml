@@ -1,47 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b846fea-0835-42c7-8907-34eae4eee776" name="Default Changelist" comment="" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <list default="true" id="4b846fea-0835-42c7-8907-34eae4eee776" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="-910818373">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="5" />
-          <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.12" value="1" />
-          <entry key="project.open.time.8" value="2" />
-          <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="5" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="py" value="16" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="Python" value="16" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="Python Console" value="371" />
-          <entry key="py" value="3389" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="Python" value="3760" />
-        </counts>
-      </usages-collector>
-    </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
@@ -70,7 +40,7 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/dateutil/parser.py">
+        <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/dateutil/parser.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="9265">
               <caret line="558" selection-start-line="558" selection-end-line="558" />
@@ -79,7 +49,7 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/colormap.py">
+        <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/colormap.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1836">
               <caret line="110" selection-start-line="110" selection-end-line="110" />
@@ -104,6 +74,9 @@
       <replace>self.timeline_needed</replace>
       <replace>volunteer_settings</replace>
     </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -138,30 +111,20 @@
       </pane>
     </panes>
   </component>
-  <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.build" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "git-widget-placeholder": "master"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Weber\Labo\Programmes Python\user_interface\gestion_benevoles" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
   <component name="RunManager" selected="Python.model_view_backup">
     <configuration name="model_view" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gestion_benevoles" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -183,6 +146,7 @@
     </configuration>
     <configuration name="model_view_backup" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gestion_benevoles" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -204,6 +168,7 @@
     </configuration>
     <configuration name="model_view_backup2" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gestion_benevoles" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -225,6 +190,7 @@
     </configuration>
     <configuration name="populate_table" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gestion_benevoles" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -331,9 +297,6 @@
           <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
-      <breakpoints-dialog>
-        <breakpoints-dialog />
-      </breakpoints-dialog>
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -353,21 +316,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/parametertree/Parameter.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/parametertree/Parameter.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
           <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/parametertree/parameterTypes.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/parametertree/parameterTypes.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
           <caret line="524" column="13" selection-start-line="524" selection-start-column="13" selection-end-line="524" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/tables/node.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/tables/node.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
           <caret line="344" selection-start-line="344" selection-end-line="344" />
@@ -381,14 +344,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/spyder/widgets/helperwidgets.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/spyder/widgets/helperwidgets.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="328">
           <caret line="130" column="21" lean-forward="true" selection-start-line="130" selection-start-column="21" selection-end-line="130" selection-end-column="21" />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/tables/table.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/tables/table.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="175">
           <caret line="2058" selection-start-line="2058" selection-end-line="2058" />
@@ -409,7 +372,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/dockarea/Dock.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/dockarea/Dock.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="11" column="38" lean-forward="true" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="53" />
@@ -436,14 +399,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/dateutil/parser.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/dateutil/parser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="9265">
           <caret line="558" selection-start-line="558" selection-end-line="558" />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/colormap.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../../../WinPython-64bit-3.4.4.6Qt5/python-3.4.4.amd64/Lib/site-packages/pyqtgraph/colormap.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1836">
           <caret line="110" selection-start-line="110" selection-end-line="110" />
